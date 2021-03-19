@@ -1,5 +1,5 @@
 {
-    "java.checkstyle.configuration": "${workspaceFolder}\\config\\checkstyle\\checkstyle.xml",
+    "java.checkstyle.configuration": "/google_checks.xml",
     "java.checkstyle.version": "8.41",
     "emeraldwalk.runonsave": {
         "commands": [
@@ -9,5 +9,6 @@
             }
         ]
     },
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

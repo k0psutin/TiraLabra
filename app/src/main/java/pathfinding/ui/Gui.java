@@ -1,5 +1,7 @@
 package pathfinding.ui;
 
+import static pathfinding.tools.ImgTools.resizeImage;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -14,9 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import pathfinding.tools.ImgTools;
 
-@SuppressWarnings("checkstyle:MissingJavadocType")
 public class Gui implements Runnable {
 
   private JFrame frame;
@@ -32,7 +32,7 @@ public class Gui implements Runnable {
 
   @Override
   public void run() {
-    frame = new JFrame("Demo");
+    frame = new JFrame("Pathfinding");
     frame.setPreferredSize(new Dimension(width, height));
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -49,7 +49,7 @@ public class Gui implements Runnable {
             if (option == JFileChooser.APPROVE_OPTION) {
               File selectedFile = fileChooser.getSelectedFile();
               file = selectedFile.getName();
-              buffImg = new ImgTools().resizeImage(50, file);
+              buffImg = resizeImage(50, file);
               imageIcon.setImage(buffImg);
               picPanel.repaint();
             }
@@ -71,7 +71,7 @@ public class Gui implements Runnable {
     JButton clear = new JButton("Reset");
     panel.add(clear);
 
-    buffImg = new ImgTools().resizeImage(50, file);
+    buffImg = resizeImage(50, file);
     imageIcon = new ImageIcon(buffImg);
     picLabel = new JLabel(imageIcon);
     frame.add(panel);

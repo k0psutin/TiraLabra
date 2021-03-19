@@ -9,10 +9,10 @@ import javax.swing.ImageIcon;
 public class ImgTools {
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public BufferedImage resizeImage(int percentage, String filename) {
+  public static BufferedImage resizeImage(int percentage, String filename) {
     BufferedImage buffImg = null;
     try {
-      ImageIcon imageIcon = new ImageIcon(getClass().getClassLoader().getResource(filename));
+      ImageIcon imageIcon = new ImageIcon(ImgTools.class.getClassLoader().getResource(filename));
       int width = (int) (imageIcon.getIconWidth() * ((float) percentage / 100.0));
       int height = (int) (imageIcon.getIconHeight() * ((float) percentage / 100.0));
       buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -28,11 +28,11 @@ public class ImgTools {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public void getPixelColor(int x, int y, BufferedImage image) {
+  public static String getPixelColor(int x, int y, BufferedImage image) {
     int clr = image.getRGB(x, y);
     int red = (clr & 0x00ff0000) >> 16;
     int green = (clr & 0x0000ff00) >> 8;
     int blue = clr & 0x000000ff;
-    System.out.println("(" + red + "," + green + "," + blue + ")");
+    return "(" + red + "," + green + "," + blue + ")";
   }
 }
