@@ -14,4 +14,4 @@ Time and space complexity of JPS is a bit unclear. I think it is portrayed the s
 
 ## What should I do next
 
-Next I will implement A\*, JPS and IDA\* algorithms using the standard Java data structures and try to utilize them for finding a path on an image.
+Next I will implement A\* and JPS algorithms using the standard Java data structures and try to utilize them for finding a path on an image. I will also implement IDA\* this week if i have time.
