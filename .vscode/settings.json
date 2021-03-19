@@ -1,0 +1,13 @@
+{
+    "java.checkstyle.configuration": "${workspaceFolder}\\config\\checkstyle\\checkstyle.xml",
+    "java.checkstyle.version": "8.41",
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.java$",
+                "cmd": "java -jar ${workspaceFolder}\\tools\\google-java-format.jar -r ${file}"
+            }
+        ]
+    },
+    "editor.formatOnSave": false
+}
