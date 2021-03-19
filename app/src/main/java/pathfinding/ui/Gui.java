@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import pathfinding.tools.ImgTools;
 
+@SuppressWarnings("checkstyle:MissingJavadocType")
 public class Gui implements Runnable {
 
   private JFrame frame;

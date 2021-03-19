@@ -5,7 +5,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 
+@SuppressWarnings("checkstyle:MissingJavadocType")
 public class ImgTools {
+
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public BufferedImage resizeImage(int percentage, String filename) {
     BufferedImage buffImg = null;
     try {
@@ -24,6 +27,7 @@ public class ImgTools {
     return buffImg;
   }
 
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public void getPixelColor(int x, int y, BufferedImage image) {
     int clr = image.getRGB(x, y);
     int red = (clr & 0x00ff0000) >> 16;
