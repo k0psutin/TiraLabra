@@ -1,5 +1,6 @@
 package pathfinding.tools;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -34,5 +35,12 @@ public class ImgTools {
     int green = (clr & 0x0000ff00) >> 8;
     int blue = clr & 0x000000ff;
     return "(" + red + "," + green + "," + blue + ")";
+  }
+
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  public static void setPixelColor(
+      int x, int y, int red, int green, int blue, BufferedImage image) {
+    Color color = new Color(red, green, blue);
+    image.setRGB(x, y, color.getRGB());
   }
 }
