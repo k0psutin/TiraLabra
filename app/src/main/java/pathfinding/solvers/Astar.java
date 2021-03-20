@@ -4,8 +4,6 @@ import static pathfinding.tools.ImgTools.getPixelColor;
 import static pathfinding.tools.ImgTools.setPixelColor;
 
 import java.awt.image.BufferedImage;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.PriorityQueue;
 import pathfinding.entities.Node;
 
@@ -28,11 +26,10 @@ public class Astar {
     return this.map;
   }
 
-  public long findPath(int startX, int startY, int endX, int endY) {
+  public void findPath(int startX, int startY, int endX, int endY) {
     this.endX = endX;
     this.endY = endY;
 
-    Instant start = Instant.now();
     Node current = new Node(null, startX, startY, 0, 0);
     closed.add(current);
     addNeighbours(current);
@@ -45,7 +42,6 @@ public class Astar {
       addNeighbours(current);
     }
     hasSolution = (current.posX == endX && current.posY == endY);
-    Instant end = Instant.now();
 
     if (hasSolution) {
       setPixelColor(current.posX, current.posY, 0, 0, 255, this.map);
@@ -54,7 +50,6 @@ public class Astar {
         setPixelColor(current.posX, current.posY, 0, 0, 255, this.map);
       }
     }
-    return Duration.between(start, end).toMillis();
   }
 
   private boolean isEligibleMove(int x, int y) {
