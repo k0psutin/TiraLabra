@@ -1,9 +1,10 @@
 package pathfinding.ui;
 
+import static pathfinding.tools.ImgTools.getPixelColor;
 import static pathfinding.tools.ImgTools.resizeImage;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,8 +30,11 @@ public class Gui implements Runnable {
   private String file = "arena.png";
   public static BufferedImage buffImg = null;
   private JLabel picLabel = null;
-  private ImageIcon imageIcon = null;
-  private JPanel picPanel = null;
+  public static ImageIcon imageIcon = null;
+  public static JPanel picPanel = null;
+  private JLabel solveTime = null;
+  private JLabel startPos = null;
+  private JLabel endPos = null;
   private static JComboBox<String> comboBox;
 
   private static boolean addStart = false;
@@ -40,13 +44,19 @@ public class Gui implements Runnable {
   private static int endY = 100;
   private static int endX = 100;
 
-  private String[] paths = {"A*", "JSP", "IDA*"};
+  private String[] paths = {"A*", "JPS", "IDA*"};
+
+  public final int imgResize = 80;
+
+  public static void updatePic() {
+    picPanel.repaint();
+  }
 
   @Override
   public void run() {
     frame = new JFrame("Pathfinding");
-    frame.setPreferredSize(new Dimension(width, height));
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     JPanel panel = new JPanel();
 
@@ -62,7 +72,7 @@ public class Gui implements Runnable {
             if (option == JFileChooser.APPROVE_OPTION) {
               File selectedFile = fileChooser.getSelectedFile();
               file = selectedFile.getName();
-              buffImg = resizeImage(50, file);
+              buffImg = resizeImage(imgResize, file);
               imageIcon.setImage(buffImg);
               picPanel.repaint();
             }
@@ -99,9 +109,15 @@ public class Gui implements Runnable {
           public void actionPerformed(ActionEvent e) {
             BufferedImage newMap = null;
             if (comboBox.getSelectedItem().equals("A*")) {
-              Astar astar = new Astar(buffImg);
-              astar.findPath(startX, startY, endX, endY);
+              Astar astar = new Astar(startX, startY, endX, endY, buffImg);
+              solveTime.setText(astar.findPath());
               newMap = astar.getMap();
+            } else if (comboBox.getSelectedItem().equals("JPS")) {
+              // Jps jps = new Jps(startX, startY, endX, endY, buffImg, true);
+              // solveTime.setText(jps.solve());
+              // newMap = jps.getMap();
+            } else if (comboBox.getSelectedItem().equals("IDA*")) {
+              return;
             }
             if (newMap == null) {
               return;
@@ -120,16 +136,23 @@ public class Gui implements Runnable {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            buffImg = resizeImage(50, file);
+            buffImg = resizeImage(imgResize, file);
             imageIcon.setImage(buffImg);
             picPanel.repaint();
           }
         });
 
-    buffImg = resizeImage(50, file);
+    buffImg = resizeImage(imgResize, file);
     imageIcon = new ImageIcon(buffImg);
     picLabel = new JLabel(imageIcon);
 
+    startPos = new JLabel("Start point: (" + startX + "," + startY + ")");
+    panel.add(startPos);
+    endPos = new JLabel("End point: (" + endX + "," + endY + ")");
+    panel.add(endPos);
+    solveTime = new JLabel("               ");
+    panel.add(solveTime);
+    panel.setLayout(new GridLayout(2, 3, 2, 2));
     frame.add(panel);
 
     picPanel = new JPanel();
@@ -138,16 +161,22 @@ public class Gui implements Runnable {
           @Override
           public void mouseReleased(MouseEvent e) {
             Point pos = e.getPoint();
+            int posX = pos.x - ((1919 / 2) - (buffImg.getWidth() / 2));
+            int posY = pos.y - 5;
             if (Gui.addEnd) {
-              endX = pos.x - 225;
-              endY = pos.y - 4;
+              if (isSafe(posX, posY)) {
+                endX = posX;
+                endY = posY;
+              }
               addEnd = false;
-              System.out.println("End point: (" + endX + "," + endY + ")");
+              endPos.setText("End point: (" + endX + "," + endY + ")");
             } else if (Gui.addStart) {
-              startX = pos.x - 225;
-              startY = pos.y - 4;
+              if (isSafe(posX, posY)) {
+                startX = posX;
+                startY = posY;
+              }
               addStart = false;
-              System.out.println("Start point: (" + startX + "," + startY + ")");
+              startPos.setText("Start point: (" + startX + "," + startY + ")");
             }
           }
         });
@@ -157,5 +186,12 @@ public class Gui implements Runnable {
     frame.getContentPane().add(BorderLayout.CENTER, picPanel);
     frame.pack();
     frame.setVisible(true);
+  }
+
+  public boolean isSafe(int x, int y) {
+    if (x < 0 || y < 0 || x > buffImg.getWidth() - 1 || y > buffImg.getHeight() - 1) {
+      return false;
+    }
+    return getPixelColor(x, y, buffImg).equals("(229,229,229)");
   }
 }

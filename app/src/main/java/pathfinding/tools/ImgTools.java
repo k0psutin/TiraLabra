@@ -1,5 +1,6 @@
 package pathfinding.tools;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -29,6 +30,14 @@ public class ImgTools {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  public static void drawJumpPoint(int posX, int posY, int r, int g, int b, BufferedImage image) {
+    Graphics2D graph = image.createGraphics();
+    graph.setColor(new Color(r, g, b));
+    graph.drawRect(posX - 1, posY - 1, 2, 2);
+    graph.dispose();
+  }
+
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static String getPixelColor(int x, int y, BufferedImage image) {
     int clr = image.getRGB(x, y);
     int red = (clr & 0x00ff0000) >> 16;
@@ -42,5 +51,14 @@ public class ImgTools {
       int x, int y, int red, int green, int blue, BufferedImage image) {
     Color color = new Color(red, green, blue);
     image.setRGB(x, y, color.getRGB());
+  }
+
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  public static void drawLine(int x, int y, int x2, int y2, BufferedImage image) {
+    Graphics2D graph = image.createGraphics();
+    graph.setColor(new Color(255, 0, 0));
+    graph.setStroke(new BasicStroke(3));
+    graph.drawLine(x, y, x2, y2);
+    graph.dispose();
   }
 }
