@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 import pathfinding.solvers.Astar;
+import pathfinding.solvers.Jps;
 
 public class Gui implements Runnable {
 
@@ -113,9 +114,9 @@ public class Gui implements Runnable {
               solveTime.setText(astar.findPath());
               newMap = astar.getMap();
             } else if (comboBox.getSelectedItem().equals("JPS")) {
-              // Jps jps = new Jps(startX, startY, endX, endY, buffImg, true);
-              // solveTime.setText(jps.solve());
-              // newMap = jps.getMap();
+              Jps jps = new Jps(startX, startY, endX, endY, buffImg);
+              solveTime.setText(jps.findPath());
+              newMap = jps.getMap();
             } else if (comboBox.getSelectedItem().equals("IDA*")) {
               return;
             }

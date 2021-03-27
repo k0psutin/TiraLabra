@@ -24,7 +24,16 @@ public class Node implements Comparable<Node> {
 
   @Override
   public int compareTo(Node o) {
-    return (int) (scoreF - o.scoreF);
+    return (scoreF < o.scoreF) ? -1 : (o.scoreF < scoreF) ? 1 : 0;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Node)) {
+      return false;
+    }
+    Node other = (Node) obj;
+    return ((posX == other.posX) && (posY == other.posY));
   }
 
   @Override
