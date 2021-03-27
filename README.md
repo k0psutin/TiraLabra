@@ -17,3 +17,4 @@ User guide
 ## Weekly reports
 
 [Week 1](/docs/week1.md)
+[Week 2](/docs/week2.md)
