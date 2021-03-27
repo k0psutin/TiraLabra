@@ -2,7 +2,7 @@
 
 ## What I have done this week and program progression
 
-I have tried to implement A* and JPS algorithms.
+I have tried to implement A* and JPS algorithms, written some JavaDoc and tests.
 
 ## What I have learned this week
 
@@ -10,9 +10,11 @@ About different Heuristics and their use.
 
 ## What is unclear or has proven to be difficult?
 
-I'm not sure if A* is actually really slow in 500x500 spaces or is my algorithm just running very slowly. If I disable backtracking, A\* will work at super speeds, but paths are not optimal. 
+I'm not sure if A* is actually really slow in 500x500 spaces or is my algorithm just running very slowly. If I disable backtracking, A\* will work at super speeds, but paths are not optimal.
 Maybe I should reduce the map sizes even further. Maybe the problem are tiebreakers?
+
+For now i have reduced the map size to 150x150, A\* works on it quite well most of the time. Sometimes JPS can finish a route in 15ms where as A\* has been running 10 seconds.
 
 ## What should I do next
 
-I'm creating tests to ensure Node class is working properly with PriorityQueue and try figure out why my A\* algorithm is slow, before moving into JPS and IDA\*.
+I have to continue to implement IDA* and my own data structures even though I'm not sure if A\* is still working like it should.
