@@ -1,5 +1,6 @@
 package pathfinding.ui;
 
+import static pathfinding.tools.ImgTools.loadImage;
 import static pathfinding.tools.ImgTools.resizeImage;
 
 import java.awt.BorderLayout;
@@ -25,8 +26,6 @@ import pathfinding.solvers.Jps;
 public class Gui implements Runnable {
 
   private JFrame frame;
-  private int width = 1000;
-  private int height = 700;
   private String file = "arena.png";
   public static BufferedImage buffImg = null;
   private JLabel picLabel = null;
@@ -46,13 +45,15 @@ public class Gui implements Runnable {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
 
-  public final int imgResize = 15;
+  public final int imgResize = 80;
+  private final int imgSize = 150;
 
   @Override
   public void run() {
     frame = new JFrame("Pathfinding");
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    buffImg = loadImage(file);
 
     JPanel panel = new JPanel();
 
@@ -68,7 +69,7 @@ public class Gui implements Runnable {
             if (option == JFileChooser.APPROVE_OPTION) {
               File selectedFile = fileChooser.getSelectedFile();
               file = selectedFile.getName();
-              buffImg = resizeImage(imgResize, file);
+              buffImg = resizeImage(800, 800, loadImage(file));
               imageIcon.setImage(buffImg);
               picPanel.repaint();
             }
@@ -105,11 +106,12 @@ public class Gui implements Runnable {
           public void actionPerformed(ActionEvent e) {
             BufferedImage newMap = null;
             if (comboBox.getSelectedItem().equals("A*")) {
-              Astar astar = new Astar(startX, startY, endX, endY, buffImg);
+              Astar astar =
+                  new Astar(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
               solveTime.setText(astar.findPath());
               newMap = astar.getMap();
             } else if (comboBox.getSelectedItem().equals("JPS")) {
-              Jps jps = new Jps(startX, startY, endX, endY, buffImg);
+              Jps jps = new Jps(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
               solveTime.setText(jps.findPath());
               newMap = jps.getMap();
             } else if (comboBox.getSelectedItem().equals("IDA*")) {
@@ -118,7 +120,7 @@ public class Gui implements Runnable {
             if (newMap == null) {
               return;
             }
-            imageIcon.setImage(newMap);
+            imageIcon.setImage(resizeImage(800, 800, newMap));
             picPanel.repaint();
           }
         });
@@ -132,14 +134,13 @@ public class Gui implements Runnable {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            buffImg = resizeImage(imgResize, file);
+            buffImg = resizeImage(800, 800, buffImg);
             imageIcon.setImage(buffImg);
             picPanel.repaint();
           }
         });
 
-    buffImg = resizeImage(imgResize, file);
-    imageIcon = new ImageIcon(buffImg);
+    imageIcon = new ImageIcon(resizeImage(800, 800, buffImg));
     picLabel = new JLabel(imageIcon);
     picLabel.setLayout(null);
     picLabel.setBounds(0, 0, 800, 800);
@@ -160,20 +161,14 @@ public class Gui implements Runnable {
           @Override
           public void mouseReleased(MouseEvent e) {
             Point pos = e.getPoint();
-            if (pos.x < 0
-                || pos.y < 0
-                || pos.x > buffImg.getWidth() - 1
-                || pos.y > buffImg.getHeight() - 1) {
-              return;
-            }
             if (Gui.addEnd) {
-              endX = pos.x;
-              endY = pos.y;
+              endX = (int) (pos.x / 5.4);
+              endY = (int) (pos.y / 5.4);
               addEnd = false;
               endPos.setText("End point: (" + endX + "," + endY + ")");
             } else if (Gui.addStart) {
-              startX = pos.x;
-              startY = pos.y;
+              startX = (int) (pos.x / 5.4);
+              startY = (int) (pos.y / 5.4);
               addStart = false;
               startPos.setText("Start point: (" + startX + "," + startY + ")");
             }

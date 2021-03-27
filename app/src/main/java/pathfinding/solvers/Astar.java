@@ -60,6 +60,12 @@ public class Astar {
    * @return String
    */
   public String findPath() {
+    if (!isEligibleMove(startX, startY)) {
+      return "Start position not reachable.";
+    }
+    if (!isEligibleMove(endX, endY)) {
+      return "End position not reachable.";
+    }
     Node current = new Node(null, startX, startY, 0, 0);
     open.add(current);
     Instant start = Instant.now();
@@ -70,7 +76,7 @@ public class Astar {
       if (current.posX == endX && current.posY == endY) {
         break;
       }
-      if (Duration.between(start, running).toMillis() > 5000) {
+      if (Duration.between(start, running).toMillis() > 10000) {
         return "Timeout.";
       }
       addNeighbours(current);
@@ -115,7 +121,7 @@ public class Astar {
   public float distance(int currentX, int currentY) {
     int dx = Math.abs(currentX - endX);
     int dy = Math.abs(currentY - endY);
-    int c = 2;
+    int c = 1;
     return (c * Math.max(dx, dy) + 0.42f * c * Math.min(dx, dy));
   }
 
@@ -140,10 +146,7 @@ public class Astar {
         Node neighbour =
             new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
 
-        if (closed.contains(neighbour)) {
-          continue;
-        }
-        if (!open.contains(neighbour)) {
+        if (!open.contains(neighbour) && !closed.contains(neighbour)) {
           open.add(neighbour);
         }
       }

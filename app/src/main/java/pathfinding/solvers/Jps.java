@@ -158,17 +158,8 @@ public class Jps extends Astar {
         int dy = normalize(node.posY, current.posY);
         Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
         if (jump != null) {
-          if (closed.contains(jump)) {
-            continue;
-          }
-          if (!open.contains(jump)) {
+          if (!open.contains(jump) && !closed.contains(jump)) {
             open.add(jump);
-          } else {
-            if (jump.scoreG < current.scoreG) {
-              open.remove(jump);
-              open.add(jump);
-              System.out.println("Found shorter path, updating");
-            }
           }
         }
       }
