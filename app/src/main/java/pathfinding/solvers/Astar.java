@@ -26,6 +26,8 @@ public class Astar {
 
   public boolean hasSolution = false;
 
+  public long timeout = 5000;
+
   /**
    * Constructor for Astar pathfinding.
    *
@@ -76,7 +78,7 @@ public class Astar {
       if (current.posX == endX && current.posY == endY) {
         break;
       }
-      if (Duration.between(start, running).toMillis() > 10000) {
+      if (Duration.between(start, running).toMillis() > timeout) {
         return "Timeout.";
       }
       addNeighbours(current);
@@ -121,8 +123,7 @@ public class Astar {
   public float distance(int currentX, int currentY) {
     int dx = Math.abs(currentX - endX);
     int dy = Math.abs(currentY - endY);
-    int c = 1;
-    return (c * Math.max(dx, dy) + 0.42f * c * Math.min(dx, dy));
+    return (Math.max(dx, dy) + 0.42f * Math.min(dx, dy));
   }
 
   /**
@@ -146,9 +147,15 @@ public class Astar {
         Node neighbour =
             new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
 
-        if (!open.contains(neighbour) && !closed.contains(neighbour)) {
-          open.add(neighbour);
+        if (closed.contains(neighbour)) {
+          continue;
         }
+
+        if (open.contains(neighbour)) {
+          continue;
+        }
+
+        open.add(neighbour);
       }
     }
   }

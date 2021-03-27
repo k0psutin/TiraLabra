@@ -133,37 +133,55 @@ public class Jps extends Astar {
 
   @Override
   public void addNeighbours(Node current) {
-    if (current == null) {
-      return;
-    }
-    if (current.parent == null) {
-      for (int x = -1; x <= 1; x++) {
-        for (int y = -1; y <= 1; y++) {
-          int newX = current.posX + x;
-          int newY = current.posY + y;
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        int newX = current.posX + x;
+        int newY = current.posY + y;
 
-          if (x == 0 && y == 0) {
-            continue;
-          }
-
-          float score = (x != 0 && x != 0) ? 1.42f : 1f;
-          Node node = new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
-          open.add(node);
+        if (x == 0 && y == 0) {
           continue;
         }
-      }
-    } else {
-      for (Node node : pruneNeighbours(current)) {
-        int dx = normalize(node.posX, current.posX);
-        int dy = normalize(node.posY, current.posY);
-        Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
-        if (jump != null) {
-          if (!open.contains(jump) && !closed.contains(jump)) {
+
+        if (!isEligibleMove(newX, newY)) {
+          continue;
+        }
+
+        float score = (x != 0 && x != 0) ? 1.42f : 1f;
+        Node node = new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
+        if (current.parent == null) {
+          open.add(node);
+        } else {
+          int dx = normalize(node.posX, current.posX);
+          int dy = normalize(node.posY, current.posY);
+          Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
+          if (closed.contains(jump)) {
+            continue;
+          }
+          if (open.contains(jump)) {
+            continue;
+          }
+          if (jump != null) {
             open.add(jump);
           }
         }
       }
     }
+    /*
+    for (Node node : pruneNeighbours(current)) {
+      int dx = normalize(node.posX, current.posX);
+      int dy = normalize(node.posY, current.posY);
+      Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
+      if (closed.contains(jump)) {
+        continue;
+      }
+      if (open.contains(jump)) {
+        continue;
+      }
+      if (jump != null) {
+        open.add(jump);
+      }
+    }
+    */
   }
 
   public static int normalize(int to, int from) {

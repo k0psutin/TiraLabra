@@ -19,7 +19,7 @@ jacocoTestReport {
     }
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/pathfinding/ui/**', '**/pathfinding/main/**'])
+            fileTree(dir: it, exclude: ['**/pathfinding/ui/**', '**/pathfinding/main/**', '**/pathfinding/tools/ImgTools.java'])
         }))
     }
 }

@@ -30,24 +30,24 @@ public class NodeTest {
   }
 
   @Test
-  public void returnTrueIfSameCoordinates() {
+  public void testReturnTrueIfSameCoordinates() {
     assertTrue((first.equals(second)));
   }
 
   @Test
-  public void returnFalseIfNotSameCoordinates() {
+  public void testReturnFalseIfNotSameCoordinates() {
     second = new Node(first, 0, 1, 10, 10);
     assertFalse((first.equals(second)));
   }
 
   @Test
-  public void returnTrueIfInQueue() {
+  public void testReturnTrueIfInQueue() {
     queue.add(first);
     assertTrue(queue.contains(second));
   }
 
   @Test
-  public void returnFalseIfNotInQueue() {
+  public void testReturnFalseIfNotInQueue() {
     queue.add(first);
     second = new Node(first, 0, 1, 10, 10);
     queue.add(second);
@@ -55,7 +55,7 @@ public class NodeTest {
   }
 
   @Test
-  public void queueReturnsSmallestFscore() {
+  public void testQueueReturnsSmallestFscore() {
     float score = 0;
     for (int x = 0; x <= 10; x++) {
       score += 1;
