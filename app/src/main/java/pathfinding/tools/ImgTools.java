@@ -13,15 +13,21 @@ public class ImgTools {
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static BufferedImage resizeImage(int percentage, String filename) {
     BufferedImage buffImg = null;
+    ImageIcon imageIcon = null;
+    int width = 0;
+    int height = 0;
+    float downscale = (float) percentage / 100;
+    float upscale = (1 + (1 - downscale));
     try {
-      ImageIcon imageIcon = new ImageIcon(ImgTools.class.getClassLoader().getResource(filename));
-      int width = (int) (imageIcon.getIconWidth() * ((float) percentage / 100.0));
-      int height = (int) (imageIcon.getIconHeight() * ((float) percentage / 100.0));
+      imageIcon = new ImageIcon(ImgTools.class.getClassLoader().getResource(filename));
+      width = (int) (imageIcon.getIconWidth() * downscale);
+      height = (int) (imageIcon.getIconHeight() * downscale);
       buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
       Graphics2D g2d = (Graphics2D) buffImg.createGraphics();
       g2d.addRenderingHints(
           new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
       g2d.drawImage(imageIcon.getImage(), 0, 0, width, height, null);
+      g2d.dispose();
     } catch (Exception e) {
       e.printStackTrace();
       return null;
@@ -39,6 +45,9 @@ public class ImgTools {
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static String getPixelColor(int x, int y, BufferedImage image) {
+    if (x < 0 || y < 0 || x > image.getWidth() - 1 || y > image.getHeight() - 1) {
+      return "";
+    }
     int clr = image.getRGB(x, y);
     int red = (clr & 0x00ff0000) >> 16;
     int green = (clr & 0x0000ff00) >> 8;

@@ -1,5 +1,10 @@
 package pathfinding.entities;
 
+/**
+ * Node class. Holds the information of current coordinates and moving costs.
+ *
+ * <p>Implements Comparable and sorts PriorityQueue by the lowest F score.
+ */
 public class Node implements Comparable<Node> {
 
   public int posX;
@@ -11,13 +16,22 @@ public class Node implements Comparable<Node> {
   public float scoreF;
   public Node parent;
 
+  /**
+   * Node constructor.
+   *
+   * @param parent Node parent.
+   * @param posX Node position x.
+   * @param posY Node position y.
+   * @param scoreG Node total movement score.
+   * @param scoreH Node estimated cost from current position to end.
+   */
   public Node(Node parent, int posX, int posY, float scoreG, float scoreH) {
     this.parent = parent;
     this.posX = posX;
     this.posY = posY;
     this.scoreG = scoreG;
     this.scoreH = scoreH;
-    this.scoreF = scoreG + scoreH;
+    this.scoreF = scoreG + scoreH; // Total cost of travel F = G + H
     this.dx = 0;
     this.dy = 0;
   }
@@ -39,9 +53,5 @@ public class Node implements Comparable<Node> {
   @Override
   public String toString() {
     return "(" + posX + "," + posY + ")";
-  }
-
-  public Node getParent() {
-    return (parent == null) ? parent : null;
   }
 }

@@ -1,6 +1,5 @@
 package pathfinding.ui;
 
-import static pathfinding.tools.ImgTools.getPixelColor;
 import static pathfinding.tools.ImgTools.resizeImage;
 
 import java.awt.BorderLayout;
@@ -47,11 +46,7 @@ public class Gui implements Runnable {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
 
-  public final int imgResize = 80;
-
-  public static void updatePic() {
-    picPanel.repaint();
-  }
+  public final int imgResize = 15;
 
   @Override
   public void run() {
@@ -146,6 +141,8 @@ public class Gui implements Runnable {
     buffImg = resizeImage(imgResize, file);
     imageIcon = new ImageIcon(buffImg);
     picLabel = new JLabel(imageIcon);
+    picLabel.setLayout(null);
+    picLabel.setBounds(0, 0, 800, 800);
 
     startPos = new JLabel("Start point: (" + startX + "," + startY + ")");
     panel.add(startPos);
@@ -157,25 +154,26 @@ public class Gui implements Runnable {
     frame.add(panel);
 
     picPanel = new JPanel();
-    picPanel.addMouseListener(
+    picPanel.setSize(500, 500);
+    picLabel.addMouseListener(
         new MouseInputAdapter() {
           @Override
           public void mouseReleased(MouseEvent e) {
             Point pos = e.getPoint();
-            int posX = pos.x - ((1919 / 2) - (buffImg.getWidth() / 2));
-            int posY = pos.y - 5;
+            if (pos.x < 0
+                || pos.y < 0
+                || pos.x > buffImg.getWidth() - 1
+                || pos.y > buffImg.getHeight() - 1) {
+              return;
+            }
             if (Gui.addEnd) {
-              if (isSafe(posX, posY)) {
-                endX = posX;
-                endY = posY;
-              }
+              endX = pos.x;
+              endY = pos.y;
               addEnd = false;
               endPos.setText("End point: (" + endX + "," + endY + ")");
             } else if (Gui.addStart) {
-              if (isSafe(posX, posY)) {
-                startX = posX;
-                startY = posY;
-              }
+              startX = pos.x;
+              startY = pos.y;
               addStart = false;
               startPos.setText("Start point: (" + startX + "," + startY + ")");
             }
@@ -187,12 +185,5 @@ public class Gui implements Runnable {
     frame.getContentPane().add(BorderLayout.CENTER, picPanel);
     frame.pack();
     frame.setVisible(true);
-  }
-
-  public boolean isSafe(int x, int y) {
-    if (x < 0 || y < 0 || x > buffImg.getWidth() - 1 || y > buffImg.getHeight() - 1) {
-      return false;
-    }
-    return getPixelColor(x, y, buffImg).equals("(229,229,229)");
   }
 }

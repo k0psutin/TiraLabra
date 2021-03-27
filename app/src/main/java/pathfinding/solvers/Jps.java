@@ -1,9 +1,7 @@
 package pathfinding.solvers;
 
 import static pathfinding.tools.ImgTools.drawLine;
-import static pathfinding.tools.ImgTools.getPixelColor;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +11,6 @@ public class Jps extends Astar {
 
   public Jps(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
-  }
-
-  @Override
-  public boolean isEligibleMove(int x, int y) {
-    return getPixelColor(x, y, map).equals("(229,229,229)");
   }
 
   @Override
@@ -35,7 +28,7 @@ public class Jps extends Astar {
     while (true) {
       posX += x;
       posY += y;
-      newG += 1;
+      newG += (x != 0 && y != 0) ? 1.42f : 1f;
 
       if (!isEligibleMove(posX, posY)) {
         return null;
@@ -77,9 +70,9 @@ public class Jps extends Astar {
     int ny = current.posY;
     int dx = normalize(nx, px);
     int dy = normalize(ny, py);
-    float score = 1f;
-
+    float score = (dx != 0 && dy != 0) ? 1.42f : 1f;
     if (dx != 0 && dy != 0) {
+
       if (isEligibleMove(nx, ny + dy)) {
         neighbours.add(
             new Node(current, nx, ny + dy, current.scoreG + score, distance(nx, ny + dy)));
@@ -140,7 +133,6 @@ public class Jps extends Astar {
 
   @Override
   public void addNeighbours(Node current) {
-    // setPixelColor(current.posX, current.posY, 255, 155, 155, this.map);
     if (current == null) {
       return;
     }
@@ -150,14 +142,11 @@ public class Jps extends Astar {
           int newX = current.posX + x;
           int newY = current.posY + y;
 
-          Point point = new Point(newX, newY);
-
           if (x == 0 && y == 0) {
             continue;
           }
 
-          // setPixelColor(newX, newY, 255, 0, 0, this.map);
-          float score = 1;
+          float score = (x != 0 && x != 0) ? 1.42f : 1f;
           Node node = new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
           open.add(node);
           continue;
@@ -169,7 +158,18 @@ public class Jps extends Astar {
         int dy = normalize(node.posY, current.posY);
         Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
         if (jump != null) {
-          open.add(jump);
+          if (closed.contains(jump)) {
+            continue;
+          }
+          if (!open.contains(jump)) {
+            open.add(jump);
+          } else {
+            if (jump.scoreG < current.scoreG) {
+              open.remove(jump);
+              open.add(jump);
+              System.out.println("Found shorter path, updating");
+            }
+          }
         }
       }
     }
