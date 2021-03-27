@@ -114,7 +114,7 @@ public class Astar {
   }
 
   /**
-   * Returns the octile distance between two points.
+   * Returns the octile distance between two points. Approximation of total cost between two points.
    *
    * @param currentX Current x coordinate.
    * @param currentY Current y coordinate.

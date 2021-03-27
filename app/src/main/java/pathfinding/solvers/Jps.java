@@ -3,8 +3,6 @@ package pathfinding.solvers;
 import static pathfinding.tools.ImgTools.drawLine;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 import pathfinding.entities.Node;
 
 public class Jps extends Astar {
@@ -62,75 +60,6 @@ public class Jps extends Astar {
     }
   }
 
-  public List<Node> pruneNeighbours(Node current) {
-    List<Node> neighbours = new ArrayList<>();
-    int px = current.parent.posX;
-    int py = current.parent.posY;
-    int nx = current.posX;
-    int ny = current.posY;
-    int dx = normalize(nx, px);
-    int dy = normalize(ny, py);
-    float score = (dx != 0 && dy != 0) ? 1.42f : 1f;
-    if (dx != 0 && dy != 0) {
-
-      if (isEligibleMove(nx, ny + dy)) {
-        neighbours.add(
-            new Node(current, nx, ny + dy, current.scoreG + score, distance(nx, ny + dy)));
-      }
-      if (isEligibleMove(nx + dx, ny)) {
-        neighbours.add(
-            new Node(current, nx + dx, ny, current.scoreG + score, distance(nx + dx, ny)));
-      }
-      if (isEligibleMove(nx + dx, ny + dy)) {
-        neighbours.add(
-            new Node(
-                current, nx + dx, ny + dy, current.scoreG + score, distance(nx + dx, ny + dx)));
-      }
-      if (!isEligibleMove(nx - dx, ny)) {
-        neighbours.add(
-            new Node(
-                current, nx - dx, ny + dy, current.scoreG + score, distance(nx - dx, ny + dx)));
-      }
-      if (!isEligibleMove(nx, ny - dy)) {
-        neighbours.add(
-            new Node(
-                current, nx + dx, ny - dy, current.scoreG + score, distance(nx + dx, ny - dy)));
-      }
-    } else {
-      if (dx == 0) {
-        if (isEligibleMove(nx, ny + dy)) {
-          neighbours.add(
-              new Node(current, nx, ny + dy, current.scoreG + score, distance(nx, ny + dy)));
-        }
-        if (!isEligibleMove(nx + 1, ny)) {
-          neighbours.add(
-              new Node(current, nx + 1, ny + dy, current.scoreG + score, distance(nx + 1, ny + 1)));
-        }
-        if (!isEligibleMove(nx - 1, ny)) {
-          neighbours.add(
-              new Node(
-                  current, nx - 1, ny + dy, current.scoreG + score, distance(nx - 1, ny + dy)));
-        }
-      } else {
-        if (isEligibleMove(nx + dx, ny)) {
-          neighbours.add(
-              new Node(current, nx + dx, ny, current.scoreG + score, distance(nx + dx, ny)));
-        }
-        if (!isEligibleMove(nx, ny + 1)) {
-          neighbours.add(
-              new Node(
-                  current, nx + dx, ny + 1, current.scoreG + score, distance(nx + dx, ny + 1)));
-        }
-        if (!isEligibleMove(nx, ny - 1)) {
-          neighbours.add(
-              new Node(
-                  current, nx + dx, ny - 1, current.scoreG + score, distance(nx + dx, ny - 1)));
-        }
-      }
-    }
-    return neighbours;
-  }
-
   @Override
   public void addNeighbours(Node current) {
     for (int x = -1; x <= 1; x++) {
@@ -166,22 +95,6 @@ public class Jps extends Astar {
         }
       }
     }
-    /*
-    for (Node node : pruneNeighbours(current)) {
-      int dx = normalize(node.posX, current.posX);
-      int dy = normalize(node.posY, current.posY);
-      Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
-      if (closed.contains(jump)) {
-        continue;
-      }
-      if (open.contains(jump)) {
-        continue;
-      }
-      if (jump != null) {
-        open.add(jump);
-      }
-    }
-    */
   }
 
   public static int normalize(int to, int from) {
