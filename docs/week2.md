@@ -15,6 +15,10 @@ Maybe I should reduce the map sizes even further. Maybe the problem are tiebreak
 
 For now i have reduced the map size to 150x150, A\* works on it quite well most of the time. Sometimes JPS can finish a route in 15ms where as A\* has been running 10 seconds.
 
+Edit 30.3:
+
+- A\* was running slow because it seems I made a mistake with the hashing and HashMap didn't work as intended. Problem did not appear in tests. Now I can finally concentrate on JPS and IDA\*.
+
 ## What should I do next
 
 I have to continue to implement IDA* and my own data structures even though I'm not sure if A\* is still working like it should.
