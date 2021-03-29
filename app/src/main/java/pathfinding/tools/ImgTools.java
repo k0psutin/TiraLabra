@@ -21,14 +21,14 @@ public class ImgTools {
     return scaledImg;
   }
 
-  public static BufferedImage loadImage(String filename) {
+  public static BufferedImage loadImage(String filename, int imgSize) {
     BufferedImage buffImg = null;
     try {
       buffImg = ImageIO.read(ImgTools.class.getClassLoader().getResource(filename));
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
-    return resizeImage(150, 150, buffImg);
+    return resizeImage(imgSize, imgSize, buffImg);
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")

@@ -3,6 +3,8 @@ package pathfinding.solvers;
 import static pathfinding.tools.ImgTools.drawLine;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import pathfinding.entities.Node;
 
 public class Jps extends Astar {
@@ -22,7 +24,7 @@ public class Jps extends Astar {
   }
 
   private Node jumpSuccessor(Node current, int posX, int posY, int x, int y) {
-    float newG = current.scoreG;
+    float newG = gscores.get(current);
     while (true) {
       posX += x;
       posY += y;
@@ -33,31 +35,88 @@ public class Jps extends Astar {
       }
 
       if (posX == endX && posY == endY) {
-        return new Node(current, posX, posY, newG, distance(posX, posY));
+        gscores.put(new Node(current, posX, posY), newG);
+        return new Node(current, posX, posY);
       }
       if (x == 0 || y == 0) {
         if (x != 0) {
           if ((isEligibleMove(posX + x, posY + 1) && !isEligibleMove(posX, posY + 1))
               || (isEligibleMove(posX + x, posY - 1) && !isEligibleMove(posX, posY - 1))) {
-            return new Node(current, posX, posY, newG, distance(posX, posY));
+            gscores.put(new Node(current, posX, posY), newG);
+            return new Node(current, posX, posY);
           }
         } else {
           if ((isEligibleMove(posX + 1, posY + y) && !isEligibleMove(posX + 1, posY))
               || (isEligibleMove(posX - 1, posY + y) && !isEligibleMove(posX - 1, posY))) {
-            return new Node(current, posX, posY, newG, distance(posX, posY));
+            gscores.put(new Node(current, posX, posY), newG);
+            return new Node(current, posX, posY);
           }
         }
       } else if (x != 0 && y != 0) {
         if (!isEligibleMove(posX + x, posY + y)
             && isEligibleMove(posX + x, posY)
             && isEligibleMove(posX, posY + y)) {
-          return new Node(current, posX, posY, newG, distance(posX, posY));
+          gscores.put(new Node(current, posX, posY), newG);
+          return new Node(current, posX, posY);
         } else if (jumpSuccessor(current, posX + x, posY, x, 0) != null
             || jumpSuccessor(current, posX, posY + y, 0, y) != null) {
-          return new Node(current, posX, posY, newG, distance(posX, posY));
+          gscores.put(new Node(current, posX, posY), newG);
+          return new Node(current, posX, posY);
         }
       }
     }
+  }
+
+  public List<Node> pruneNeighbours(Node current) {
+    List<Node> neighbours = new ArrayList<>();
+    int px = current.parent.posX;
+    int py = current.parent.posY;
+    int nx = current.posX;
+    int ny = current.posY;
+    int dx = normalize(nx, px);
+    int dy = normalize(ny, py);
+    float score = (dx != 0 && dy != 0) ? 1.42f : 1f;
+    if (dx != 0 && dy != 0) {
+
+      if (isEligibleMove(nx, ny + dy)) {
+        neighbours.add(new Node(current, nx, ny + dy));
+      }
+      if (isEligibleMove(nx + dx, ny)) {
+        neighbours.add(new Node(current, nx + dx, ny));
+      }
+      if (isEligibleMove(nx + dx, ny + dy)) {
+        neighbours.add(new Node(current, nx + dx, ny + dy));
+      }
+      if (!isEligibleMove(nx - dx, ny)) {
+        neighbours.add(new Node(current, nx - dx, ny + dy));
+      }
+      if (!isEligibleMove(nx, ny - dy)) {
+        neighbours.add(new Node(current, nx + dx, ny - dy));
+      }
+    } else {
+      if (dx == 0) {
+        if (isEligibleMove(nx, ny + dy)) {
+          neighbours.add(new Node(current, nx, ny + dy));
+        }
+        if (!isEligibleMove(nx + 1, ny)) {
+          neighbours.add(new Node(current, nx + 1, ny + dy));
+        }
+        if (!isEligibleMove(nx - 1, ny)) {
+          neighbours.add(new Node(current, nx - 1, ny + dy));
+        }
+      } else {
+        if (isEligibleMove(nx + dx, ny)) {
+          neighbours.add(new Node(current, nx + dx, ny));
+        }
+        if (!isEligibleMove(nx, ny + 1)) {
+          neighbours.add(new Node(current, nx + dx, ny + 1));
+        }
+        if (!isEligibleMove(nx, ny - 1)) {
+          neighbours.add(new Node(current, nx + dx, ny - 1));
+        }
+      }
+    }
+    return neighbours;
   }
 
   @Override
@@ -74,22 +133,38 @@ public class Jps extends Astar {
         if (!isEligibleMove(newX, newY)) {
           continue;
         }
-
-        float score = (x != 0 && x != 0) ? 1.42f : 1f;
-        Node node = new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
         if (current.parent == null) {
-          open.add(node);
+          float movementCost = (x != 0 && y != 0) ? 1.42f : 1f;
+          Node neighbour = new Node(current, newX, newY);
+
+          if (closed.contains(neighbour)) {
+            continue;
+          }
+
+          float currentCost = gscores.getOrDefault(neighbour, 0f);
+          float newCost = currentCost + movementCost;
+          neighbour.scoreF = newCost + distance(neighbour.posX, neighbour.posY);
+          open.add(neighbour);
+          gscores.put(neighbour, newCost);
         } else {
-          int dx = normalize(node.posX, current.posX);
-          int dy = normalize(node.posY, current.posY);
-          Node jump = jumpSuccessor(current, node.posX, node.posY, dx, dy);
+          int dx = normalize(newX, current.posX);
+          int dy = normalize(newY, current.posY);
+          Node jump = jumpSuccessor(current, newX, newY, dx, dy);
+          if (jump == null) {
+            continue;
+          }
+
           if (closed.contains(jump)) {
             continue;
           }
-          if (open.contains(jump)) {
-            continue;
-          }
-          if (jump != null) {
+
+          float movementCost = (dx != 0 && dy != 0) ? 1.42f : 1f;
+          float currentCost = gscores.getOrDefault(jump, 0f);
+          float newCost = currentCost + movementCost;
+
+          if (!open.contains(jump) || newCost < currentCost) {
+            gscores.put(jump, newCost);
+            jump.scoreF = newCost + distance(jump.posX, jump.posY);
             open.add(jump);
           }
         }
@@ -97,7 +172,7 @@ public class Jps extends Astar {
     }
   }
 
-  public static int normalize(int to, int from) {
+  public int normalize(int to, int from) {
     return (to - from) / Math.max(Math.abs(to - from), 1);
   }
 }

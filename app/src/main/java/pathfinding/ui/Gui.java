@@ -45,15 +45,17 @@ public class Gui implements Runnable {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
 
-  public final int imgResize = 80;
-  private final int imgSize = 150;
+  private final int imgSize = 250;
+  private final int panelImgSize = 800;
+  private final float factor = (panelImgSize / imgSize) + 0.2f;
 
   @Override
   public void run() {
+
     frame = new JFrame("Pathfinding");
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-    buffImg = loadImage(file);
+    buffImg = loadImage(file, imgSize);
 
     JPanel panel = new JPanel();
 
@@ -69,7 +71,7 @@ public class Gui implements Runnable {
             if (option == JFileChooser.APPROVE_OPTION) {
               File selectedFile = fileChooser.getSelectedFile();
               file = selectedFile.getName();
-              buffImg = resizeImage(800, 800, loadImage(file));
+              buffImg = resizeImage(panelImgSize, panelImgSize, loadImage(file, imgSize));
               imageIcon.setImage(buffImg);
               picPanel.repaint();
             }
@@ -120,7 +122,7 @@ public class Gui implements Runnable {
             if (newMap == null) {
               return;
             }
-            imageIcon.setImage(resizeImage(800, 800, newMap));
+            imageIcon.setImage(resizeImage(panelImgSize, panelImgSize, newMap));
             picPanel.repaint();
           }
         });
@@ -134,16 +136,16 @@ public class Gui implements Runnable {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            buffImg = resizeImage(800, 800, buffImg);
+            buffImg = resizeImage(panelImgSize, panelImgSize, buffImg);
             imageIcon.setImage(buffImg);
             picPanel.repaint();
           }
         });
 
-    imageIcon = new ImageIcon(resizeImage(800, 800, buffImg));
+    imageIcon = new ImageIcon(resizeImage(panelImgSize, panelImgSize, buffImg));
     picLabel = new JLabel(imageIcon);
     picLabel.setLayout(null);
-    picLabel.setBounds(0, 0, 800, 800);
+    picLabel.setBounds(0, 0, panelImgSize, panelImgSize);
 
     startPos = new JLabel("Start point: (" + startX + "," + startY + ")");
     panel.add(startPos);
@@ -155,20 +157,19 @@ public class Gui implements Runnable {
     frame.add(panel);
 
     picPanel = new JPanel();
-    picPanel.setSize(500, 500);
     picLabel.addMouseListener(
         new MouseInputAdapter() {
           @Override
           public void mouseReleased(MouseEvent e) {
             Point pos = e.getPoint();
             if (Gui.addEnd) {
-              endX = (int) (pos.x / 5.4);
-              endY = (int) (pos.y / 5.4);
+              endX = (int) (pos.x / factor);
+              endY = (int) (pos.y / factor);
               addEnd = false;
               endPos.setText("End point: (" + endX + "," + endY + ")");
             } else if (Gui.addStart) {
-              startX = (int) (pos.x / 5.4);
-              startY = (int) (pos.y / 5.4);
+              startX = (int) (pos.x / factor);
+              startY = (int) (pos.y / factor);
               addStart = false;
               startPos.setText("Start point: (" + startX + "," + startY + ")");
             }

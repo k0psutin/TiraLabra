@@ -17,8 +17,8 @@ public class NodeTest {
 
   @Before
   public void setUp() throws Exception {
-    first = new Node(null, 0, 0, 0, 0);
-    second = new Node(first, 0, 0, 10, 10);
+    first = new Node(null, 0, 0);
+    second = new Node(first, 0, 0);
     queue = new PriorityQueue<Node>();
   }
 
@@ -36,7 +36,7 @@ public class NodeTest {
 
   @Test
   public void testReturnFalseIfNotSameCoordinates() {
-    second = new Node(first, 0, 1, 10, 10);
+    second = new Node(first, 0, 1);
     assertFalse((first.equals(second)));
   }
 
@@ -49,22 +49,24 @@ public class NodeTest {
   @Test
   public void testReturnFalseIfNotInQueue() {
     queue.add(first);
-    second = new Node(first, 0, 1, 10, 10);
+    second = new Node(first, 0, 1);
     queue.add(second);
-    assertFalse(queue.contains(new Node(second, 0, 2, 12, 12)));
+    assertFalse(queue.contains(new Node(second, 0, 2)));
   }
 
   @Test
   public void testQueueReturnsSmallestFscore() {
-    float score = 0;
-    for (int x = 0; x <= 10; x++) {
-      score += 1;
-      queue.add(new Node(first, x, 0, score, distance(x, 0, 10, 10)));
-    }
-    Node endNode = new Node(first, 10, 0, 11, distance(10, 0, 10, 10));
-    float expected = endNode.scoreF;
-    float fscore = queue.peek().scoreF;
-    String message = "Expected fScore to be " + expected + ", instead it was " + fscore;
-    assertEquals(message, fscore, expected, 0.001);
+    Node node = new Node(null, 1, 0);
+    node.scoreF = 1f + distance(1, 0, 3, 0);
+    Node node2 = new Node(null, 1, -1);
+    node2.scoreF = 1.42f + distance(1, -1, 3, 0);
+    Node node3 = new Node(null, 1, 1);
+    node3.scoreF = 1.42f + distance(1, 1, 3, 0);
+    queue.add(node3);
+    queue.add(node2);
+    queue.add(node);
+    float fscore = queue.poll().scoreF;
+    String message = "Expected fScore to be " + node.scoreF + ", instead it was " + fscore;
+    assertEquals(message, fscore, node.scoreF, 0.001);
   }
 }

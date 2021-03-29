@@ -6,6 +6,7 @@ import static pathfinding.tools.ImgTools.setPixelColor;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -15,8 +16,9 @@ import pathfinding.entities.Node;
 public class Astar {
 
   public PriorityQueue<Node> open;
-
   public Set<Node> closed;
+  public HashMap<Node, Float> gscores;
+
   public BufferedImage map;
 
   public int endX;
@@ -41,6 +43,7 @@ public class Astar {
     this.map = map;
     this.open = new PriorityQueue<Node>();
     this.closed = new HashSet<>();
+    this.gscores = new HashMap<>();
 
     this.endX = endX;
     this.endY = endY;
@@ -68,13 +71,15 @@ public class Astar {
     if (!isEligibleMove(endX, endY)) {
       return "End position not reachable.";
     }
-    Node current = new Node(null, startX, startY, 0, 0);
+    Node current = new Node(null, startX, startY);
+
     open.add(current);
+    gscores.put(current, 0f);
     Instant start = Instant.now();
     while (!open.isEmpty()) {
       current = open.poll();
       Instant running = Instant.now();
-      setPixelColor(current.posX, current.posY, 255, 155, 155, this.map);
+      setPixelColor(current.posX, current.posY, 150, 208, 255, this.map);
       if (current.posX == endX && current.posY == endY) {
         break;
       }
@@ -99,18 +104,18 @@ public class Astar {
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public void drawPath(Node current) {
-    setPixelColor(current.posX, current.posY, 255, 0, 0, this.map);
+    setPixelColor(current.posX, current.posY, 255, 252, 105, this.map);
     while (current.posX != startX || current.posY != startY) {
       current = current.parent;
-      setPixelColor(current.posX, current.posY, 255, 0, 0, this.map);
+      setPixelColor(current.posX, current.posY, 255, 252, 105, this.map);
     }
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public boolean isEligibleMove(int x, int y) {
     return getPixelColor(x, y, map).equals("(229,229,229)")
-        || getPixelColor(x, y, map).equals("(255,155,155)")
-        || getPixelColor(x, y, map).equals("(255,0,0)");
+        || getPixelColor(x, y, map).equals("(124,255,110)")
+        || getPixelColor(x, y, map).equals("(150,208,255)");
   }
 
   /**
@@ -137,25 +142,30 @@ public class Astar {
         int newX = current.posX + x;
         int newY = current.posY + y;
 
-        if (!isEligibleMove(newX, newY)) {
+        if (!isEligibleMove(newX, newY) || (x == 0 && y == 0)) {
           continue;
         }
 
-        setPixelColor(newX, newY, 255, 155, 155, this.map);
-
-        float score = (x != 0 && y != 0) ? 1.42f : 1f;
-        Node neighbour =
-            new Node(current, newX, newY, current.scoreG + score, distance(newX, newY));
+        float movementCost = (x != 0 && y != 0) ? 1.42f : 1f;
+        Node neighbour = new Node(current, newX, newY);
 
         if (closed.contains(neighbour)) {
           continue;
         }
 
-        if (open.contains(neighbour)) {
-          continue;
-        }
+        float currentCost = gscores.get(current);
+        float newCost = currentCost + movementCost;
 
-        open.add(neighbour);
+        if (!gscores.containsKey(neighbour)) {
+          setPixelColor(newX, newY, 124, 255, 110, this.map);
+          gscores.put(neighbour, newCost);
+          neighbour.scoreF = newCost + distance(newX, newY);
+          open.add(neighbour);
+        } else if (newCost < currentCost) {
+          gscores.put(neighbour, newCost);
+          neighbour.scoreF = newCost + distance(neighbour.posX, neighbour.posY);
+          open.add(neighbour);
+        }
       }
     }
   }

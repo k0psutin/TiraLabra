@@ -1,5 +1,7 @@
 package pathfinding.entities;
 
+import java.util.Objects;
+
 /**
  * Node class. Holds the information of current coordinates and moving costs.
  *
@@ -9,10 +11,6 @@ public class Node implements Comparable<Node> {
 
   public int posX;
   public int posY;
-  public int dx;
-  public int dy;
-  public float scoreG;
-  public float scoreH;
   public float scoreF;
   public Node parent;
 
@@ -22,18 +20,12 @@ public class Node implements Comparable<Node> {
    * @param parent Node parent.
    * @param posX Node position x.
    * @param posY Node position y.
-   * @param scoreG Node total movement score.
-   * @param scoreH Node estimated cost from current position to end.
    */
-  public Node(Node parent, int posX, int posY, float scoreG, float scoreH) {
+  public Node(Node parent, int posX, int posY) {
     this.parent = parent;
     this.posX = posX;
     this.posY = posY;
-    this.scoreG = scoreG;
-    this.scoreH = scoreH;
-    this.scoreF = scoreG + scoreH; // Total cost of travel F = G + H
-    this.dx = 0;
-    this.dy = 0;
+    this.scoreF = 0;
   }
 
   @Override
@@ -51,7 +43,12 @@ public class Node implements Comparable<Node> {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(posX, posY);
+  }
+
+  @Override
   public String toString() {
-    return "(" + posX + "," + posY + ")";
+    return "(" + posX + "," + posY + ") - f-score: " + scoreF;
   }
 }
