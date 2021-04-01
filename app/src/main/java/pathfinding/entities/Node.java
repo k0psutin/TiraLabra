@@ -1,6 +1,7 @@
 package pathfinding.entities;
 
 import java.util.Objects;
+import pathfinding.interfaces.Generated;
 
 /**
  * Node class. Holds the information of current coordinates and moving costs.
@@ -9,10 +10,10 @@ import java.util.Objects;
  */
 public class Node implements Comparable<Node> {
 
-  public int posX;
-  public int posY;
-  public float scoreF;
-  public Node parent;
+  private int posX;
+  private int posY;
+  private double totalCost;
+  private Node parent;
 
   /**
    * Node constructor.
@@ -25,30 +26,63 @@ public class Node implements Comparable<Node> {
     this.parent = parent;
     this.posX = posX;
     this.posY = posY;
-    this.scoreF = 0;
+    this.totalCost = 0;
+  }
+
+  public int getPosX() {
+    return this.posX;
+  }
+
+  public int getPosY() {
+    return this.posY;
+  }
+
+  public double getTotalCost() {
+    return this.totalCost;
+  }
+
+  public void setTotalCost(double totalCost) {
+    this.totalCost = totalCost;
+  }
+
+  public Node getParent() {
+    return this.parent;
   }
 
   @Override
   public int compareTo(Node o) {
-    return (scoreF < o.scoreF) ? -1 : (o.scoreF < scoreF) ? 1 : 0;
+    return (totalCost < o.totalCost) ? -1 : (o.totalCost < totalCost) ? 1 : 0;
   }
 
   @Override
   public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
     if (!(obj instanceof Node)) {
       return false;
     }
+
     Node other = (Node) obj;
-    return ((posX == other.posX) && (posY == other.posY));
+
+    if (other.posX != posX) {
+      return false;
+    }
+    if (other.posY != posY) {
+      return false;
+    }
+    return true;
   }
 
   @Override
+  @Generated
   public int hashCode() {
     return Objects.hash(posX, posY);
   }
 
   @Override
+  @Generated
   public String toString() {
-    return "(" + posX + "," + posY + ") - f-score: " + scoreF;
+    return "(" + posX + "," + posY + ") - totalCost: " + totalCost;
   }
 }
