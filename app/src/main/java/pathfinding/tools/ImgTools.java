@@ -6,11 +6,16 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import pathfinding.interfaces.Generated;
 
-@SuppressWarnings("checkstyle:MissingJavadocType")
+/** Tools for image manipulation. */
 public class ImgTools {
 
+  @Generated
+  public ImgTools() {}
+
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public static BufferedImage resizeImage(int width, int height, BufferedImage buffImg) {
     BufferedImage scaledImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = (Graphics2D) scaledImg.createGraphics();
@@ -21,6 +26,8 @@ public class ImgTools {
     return scaledImg;
   }
 
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public static BufferedImage loadImage(String filename, int imgSize) {
     BufferedImage buffImg = null;
     try {
@@ -32,6 +39,7 @@ public class ImgTools {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public static void drawJumpPoint(int posX, int posY, int r, int g, int b, BufferedImage image) {
     Graphics2D graph = image.createGraphics();
     graph.setColor(new Color(r, g, b));
@@ -52,6 +60,7 @@ public class ImgTools {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public static void setPixelColor(
       int x, int y, int red, int green, int blue, BufferedImage image) {
     Color color = new Color(red, green, blue);
@@ -59,6 +68,7 @@ public class ImgTools {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public static void drawLine(int x, int y, int x2, int y2, BufferedImage image) {
     Graphics2D graph = image.createGraphics();
     graph.setColor(new Color(255, 0, 0));

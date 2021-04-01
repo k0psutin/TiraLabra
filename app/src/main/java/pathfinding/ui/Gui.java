@@ -45,9 +45,9 @@ public class Gui implements Runnable {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
 
-  private final int imgSize = 250;
+  private final int imgSize = 800;
   private final int panelImgSize = 800;
-  private final float factor = (panelImgSize / imgSize) + 0.2f;
+  private final float factor = ((float) panelImgSize / (float) imgSize);
 
   @Override
   public void run() {
