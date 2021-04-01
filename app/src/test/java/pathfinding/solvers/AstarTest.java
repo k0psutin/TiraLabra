@@ -18,6 +18,26 @@ public class AstarTest {
   }
 
   @Test
+  public void testIllegalStartPositionReturnsStartPositionNotReachable() {
+    astar = new Astar(0, 0, 10, 24, loadImage("arena.png", 150));
+    String result = astar.findPath();
+    assertEquals(
+        "Expected ''Start position not reachable.'' instead it was " + result,
+        "Start position not reachable.",
+        result);
+  }
+
+  @Test
+  public void testIllegalEndPositionReturnsEndPositionNotReachable() {
+    astar = new Astar(22, 22, 150, 150, loadImage("arena.png", 150));
+    String result = astar.findPath();
+    assertEquals(
+        "Expected ''End position not reachable'' instead it was " + result,
+        "End position not reachable.",
+        result);
+  }
+
+  @Test
   public void testPathFound() {
     String answer = astar.findPath();
     assertTrue("Expected ''Path found'' but " + answer, answer.contains("Path found"));
@@ -33,9 +53,8 @@ public class AstarTest {
 
   @Test
   public void testDistanceApproximationReturnsCorrectAmount() {
-    astar = new Astar(0, 0, 100, 100, null);
-    float distH = astar.distance(20, 30);
-    assertEquals(109.4f, distH, 0.01f);
+    double distH = astar.distance(20, 30, 119, 24);
+    assertEquals(101.48528137423857, distH, 0.01);
   }
 
   @Test
