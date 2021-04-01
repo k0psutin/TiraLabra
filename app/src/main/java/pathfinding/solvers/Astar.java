@@ -6,18 +6,16 @@ import static pathfinding.tools.ImgTools.setPixelColor;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
+import pathfinding.collections.MinHeap;
 import pathfinding.entities.Node;
+import pathfinding.interfaces.Generated;
 
 /** Class for A* algorithm. */
 public class Astar {
 
-  public PriorityQueue<Node> open;
-  public Set<Node> closed;
-  public HashMap<Node, Float> gscores;
+  public MinHeap open;
+  public boolean[][] closed;
+  public double[][] travelCosts;
 
   public BufferedImage map;
 
@@ -29,6 +27,7 @@ public class Astar {
   public boolean hasSolution = false;
 
   public long timeout = 5000;
+  public final double sqrtTwo = Math.sqrt(2);
 
   /**
    * Constructor for Astar pathfinding.
@@ -37,13 +36,13 @@ public class Astar {
    * @param startY Start position Y.
    * @param endX End coordinate X.
    * @param endY End coordinate Y.
-   * @param map Image where algorithm will find the path.
+   * @param map The map where the algorithm will find the path.
    */
   public Astar(int startX, int startY, int endX, int endY, BufferedImage map) {
     this.map = map;
-    this.open = new PriorityQueue<Node>();
-    this.closed = new HashSet<>();
-    this.gscores = new HashMap<>();
+    this.open = new MinHeap();
+    this.closed = new boolean[map.getWidth() + 1][map.getHeight() + 1];
+    this.travelCosts = new double[map.getWidth() + 1][map.getHeight() + 1];
 
     this.endX = endX;
     this.endY = endY;
@@ -52,6 +51,7 @@ public class Astar {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
   public BufferedImage getMap() {
     return this.map;
   }
@@ -71,25 +71,28 @@ public class Astar {
     if (!isEligibleMove(endX, endY)) {
       return "End position not reachable.";
     }
+
     Node current = new Node(null, startX, startY);
 
     open.add(current);
-    gscores.put(current, 0f);
+    travelCosts[startX][startY] = 0;
     Instant start = Instant.now();
     while (!open.isEmpty()) {
       current = open.poll();
-      Instant running = Instant.now();
-      setPixelColor(current.posX, current.posY, 150, 208, 255, this.map);
-      if (current.posX == endX && current.posY == endY) {
+      // setPixelColor(current.getPosX(), current.getPosY(), 150, 208, 255, this.map);
+      if (current.getPosX() == endX && current.getPosY() == endY) {
         break;
       }
-      if (Duration.between(start, running).toMillis() > timeout) {
-        return "Timeout.";
+      for (Node neighbour : getNeighbours(current)) {
+        if (neighbour == null) {
+          continue;
+        }
+        addNeighbour(current, neighbour);
       }
-      addNeighbours(current);
-      closed.add(current);
+
+      closed[current.getPosX()][current.getPosY()] = true;
     }
-    hasSolution = (current.posX == endX && current.posY == endY);
+    hasSolution = (current.getPosX() == endX && current.getPosY() == endY);
     Instant end = Instant.now();
     String solution =
         (hasSolution)
@@ -103,19 +106,18 @@ public class Astar {
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public void drawPath(Node current) {
-    setPixelColor(current.posX, current.posY, 255, 252, 105, this.map);
-    while (current.posX != startX || current.posY != startY) {
-      current = current.parent;
-      setPixelColor(current.posX, current.posY, 255, 252, 105, this.map);
+  @Generated
+  protected void drawPath(Node current) {
+    setPixelColor(current.getPosX(), current.getPosY(), 255, 0, 0, this.map);
+    while (current.getPosX() != startX || current.getPosY() != startY) {
+      current = current.getParent();
+      setPixelColor(current.getPosX(), current.getPosY(), 255, 0, 0, this.map);
     }
   }
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public boolean isEligibleMove(int x, int y) {
-    return getPixelColor(x, y, map).equals("(229,229,229)")
-        || getPixelColor(x, y, map).equals("(124,255,110)")
-        || getPixelColor(x, y, map).equals("(150,208,255)");
+  protected boolean isEligibleMove(int x, int y) {
+    return getPixelColor(x, y, map).equals("(229,229,229)");
   }
 
   /**
@@ -123,50 +125,73 @@ public class Astar {
    *
    * @param currentX Current x coordinate.
    * @param currentY Current y coordinate.
-   * @return float
+   * @param endX End x coordinate.
+   * @param endY End y coordinate.
+   * @return distance between current and end.
    */
-  public float distance(int currentX, int currentY) {
+  public double distance(int currentX, int currentY, int endX, int endY) {
     int dx = Math.abs(currentX - endX);
     int dy = Math.abs(currentY - endY);
-    return (Math.max(dx, dy) + 0.42f * Math.min(dx, dy));
+    return (Math.max(dx, dy) + (sqrtTwo - 1) * Math.min(dx, dy));
   }
 
   /**
-   * Expands current node and add its neighbours to openlist.
+   * Expands node and return its neighbour nodes.
    *
-   * @param current Node to be expanded.
+   * @param current Node to be expanded
+   * @return Node[] array of neighbours.
    */
-  public void addNeighbours(Node current) {
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        int newX = current.posX + x;
-        int newY = current.posY + y;
+  protected Node[] getNeighbours(Node current) {
+    Node[] neighbours = new Node[8];
 
-        if (!isEligibleMove(newX, newY) || (x == 0 && y == 0)) {
-          continue;
-        }
+    neighbours[0] = new Node(current, current.getPosX() + 1, current.getPosY());
+    neighbours[1] = new Node(current, current.getPosX() - 1, current.getPosY());
+    neighbours[2] = new Node(current, current.getPosX(), current.getPosY() + 1);
+    neighbours[3] = new Node(current, current.getPosX(), current.getPosY() - 1);
+    neighbours[4] = new Node(current, current.getPosX() - 1, current.getPosY() - 1);
+    neighbours[5] = new Node(current, current.getPosX() + 1, current.getPosY() - 1);
+    neighbours[6] = new Node(current, current.getPosX() - 1, current.getPosY() + 1);
+    neighbours[7] = new Node(current, current.getPosX() + 1, current.getPosY() + 1);
 
-        float movementCost = (x != 0 && y != 0) ? 1.42f : 1f;
-        Node neighbour = new Node(current, newX, newY);
+    return neighbours;
+  }
 
-        if (closed.contains(neighbour)) {
-          continue;
-        }
+  /**
+   * Evaluates a node.
+   *
+   * <p>Calculates f(x) = g(x) + h(x), where g(x) is the current movement cost up to this point and
+   * h(x) is the approximation (heuristic) of the cost to reach the end from this point.
+   *
+   * @param current Current node
+   * @param neighbour Neighbour node
+   */
+  protected void addNeighbour(Node current, Node neighbour) {
+    int nextX = neighbour.getPosX();
+    int nextY = neighbour.getPosY();
 
-        float currentCost = gscores.get(current);
-        float newCost = currentCost + movementCost;
+    if (!isEligibleMove(nextX, nextY)) {
+      return;
+    }
 
-        if (!gscores.containsKey(neighbour)) {
-          setPixelColor(newX, newY, 124, 255, 110, this.map);
-          gscores.put(neighbour, newCost);
-          neighbour.scoreF = newCost + distance(newX, newY);
-          open.add(neighbour);
-        } else if (newCost < currentCost) {
-          gscores.put(neighbour, newCost);
-          neighbour.scoreF = newCost + distance(neighbour.posX, neighbour.posY);
-          open.add(neighbour);
-        }
-      }
+    if (closed[nextX][nextY]) {
+      return;
+    }
+
+    double currentCost = travelCosts[current.getPosX()][current.getPosY()];
+
+    double newCost = currentCost + distance(current.getPosX(), current.getPosY(), nextX, nextY);
+
+    if (travelCosts[nextX][nextY] == 0) {
+      // setPixelColor(nextX, nextY, 124, 255, 110, this.map);
+      travelCosts[nextX][nextY] = newCost;
+      neighbour.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
+      open.add(neighbour);
+      return;
+    } else if (newCost < currentCost) {
+      travelCosts[nextX][nextY] = newCost;
+      neighbour.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
+      open.add(neighbour);
+      return;
     }
   }
 }

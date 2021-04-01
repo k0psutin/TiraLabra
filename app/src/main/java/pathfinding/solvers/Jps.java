@@ -3,52 +3,55 @@ package pathfinding.solvers;
 import static pathfinding.tools.ImgTools.drawLine;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 import pathfinding.entities.Node;
+import pathfinding.interfaces.Generated;
 
+/** Class for Jump Point Search. */
 public class Jps extends Astar {
 
+  @Generated
   public Jps(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
   }
 
-  @Override
-  public void drawPath(Node current) {
+  @Generated
+  protected void drawPath(Node current) {
     Node previous = null;
-    while (current.posX != startX || current.posY != startY) {
+    while (current.getPosX() != startX || current.getPosY() != startY) {
       previous = current;
-      current = current.parent;
-      drawLine(previous.posX, previous.posY, current.posX, current.posY, this.map);
+      current = current.getParent();
+      drawLine(previous.getPosX(), previous.getPosY(), current.getPosX(), current.getPosY(), map);
     }
   }
 
+  /**
+   * Transports the current node until a valid/invalid jump location is found.
+   *
+   * @param current Current node being 'jumped'.
+   * @param posX Current node x position.
+   * @param posY Current node y position.
+   * @param x Horizontal direction: -1,0,1.
+   * @param y Vertical direction: -1,0,1.
+   * @return Returns a node if suitable place is found, null otherwise.
+   */
   private Node jumpSuccessor(Node current, int posX, int posY, int x, int y) {
-    float newG = gscores.get(current);
     while (true) {
-      posX += x;
-      posY += y;
-      newG += (x != 0 && y != 0) ? 1.42f : 1f;
-
       if (!isEligibleMove(posX, posY)) {
         return null;
       }
 
       if (posX == endX && posY == endY) {
-        gscores.put(new Node(current, posX, posY), newG);
         return new Node(current, posX, posY);
       }
       if (x == 0 || y == 0) {
         if (x != 0) {
           if ((isEligibleMove(posX + x, posY + 1) && !isEligibleMove(posX, posY + 1))
               || (isEligibleMove(posX + x, posY - 1) && !isEligibleMove(posX, posY - 1))) {
-            gscores.put(new Node(current, posX, posY), newG);
             return new Node(current, posX, posY);
           }
         } else {
           if ((isEligibleMove(posX + 1, posY + y) && !isEligibleMove(posX + 1, posY))
               || (isEligibleMove(posX - 1, posY + y) && !isEligibleMove(posX - 1, posY))) {
-            gscores.put(new Node(current, posX, posY), newG);
             return new Node(current, posX, posY);
           }
         }
@@ -56,123 +59,113 @@ public class Jps extends Astar {
         if (!isEligibleMove(posX + x, posY + y)
             && isEligibleMove(posX + x, posY)
             && isEligibleMove(posX, posY + y)) {
-          gscores.put(new Node(current, posX, posY), newG);
           return new Node(current, posX, posY);
         } else if (jumpSuccessor(current, posX + x, posY, x, 0) != null
             || jumpSuccessor(current, posX, posY + y, 0, y) != null) {
-          gscores.put(new Node(current, posX, posY), newG);
           return new Node(current, posX, posY);
         }
       }
+      posX += x;
+      posY += y;
     }
   }
 
-  public List<Node> pruneNeighbours(Node current) {
-    List<Node> neighbours = new ArrayList<>();
-    int px = current.parent.posX;
-    int py = current.parent.posY;
-    int nx = current.posX;
-    int ny = current.posY;
-    int dx = normalize(nx, px);
-    int dy = normalize(ny, py);
-    float score = (dx != 0 && dy != 0) ? 1.42f : 1f;
-    if (dx != 0 && dy != 0) {
+  protected Node[] getNeighbours(Node current) {
+    if (current.getParent() == null) {
+      return super.getNeighbours(current);
+    } else {
+      return pruneNeighbours(current);
+    }
+  }
 
-      if (isEligibleMove(nx, ny + dy)) {
-        neighbours.add(new Node(current, nx, ny + dy));
+  /**
+   * Prunes neighbours based on direction. No need to expand all 8 nodes.
+   *
+   * @param current Node to be expanded.
+   * @return Node array with pruned neighbours.
+   */
+  private Node[] pruneNeighbours(Node current) {
+    Node[] neighbours = new Node[5];
+    int parentX = current.getParent().getPosX();
+    int parentY = current.getParent().getPosY();
+    int currentX = current.getPosX();
+    int currentY = current.getPosY();
+    int dx = normalize(parentX, currentX);
+    int dy = normalize(parentY, currentY);
+
+    if (dx != 0 && dy != 0) {
+      if (isEligibleMove(currentX, currentY + dy)) {
+        neighbours[0] = new Node(current, currentX, currentY + dy);
       }
-      if (isEligibleMove(nx + dx, ny)) {
-        neighbours.add(new Node(current, nx + dx, ny));
+      if (isEligibleMove(currentX + dx, currentY)) {
+        neighbours[1] = new Node(current, currentX + dx, currentY);
       }
-      if (isEligibleMove(nx + dx, ny + dy)) {
-        neighbours.add(new Node(current, nx + dx, ny + dy));
+      if (isEligibleMove(currentX + dx, currentY + dy)) {
+        neighbours[2] = new Node(current, currentX + dx, currentY + dy);
       }
-      if (!isEligibleMove(nx - dx, ny)) {
-        neighbours.add(new Node(current, nx - dx, ny + dy));
+      if (!isEligibleMove(currentX - dx, currentY)) {
+        neighbours[3] = new Node(current, currentX - dx, currentY + dy);
       }
-      if (!isEligibleMove(nx, ny - dy)) {
-        neighbours.add(new Node(current, nx + dx, ny - dy));
+      if (!isEligibleMove(currentX, currentY - dy)) {
+        neighbours[4] = new Node(current, currentX + dx, currentY - dy);
       }
     } else {
       if (dx == 0) {
-        if (isEligibleMove(nx, ny + dy)) {
-          neighbours.add(new Node(current, nx, ny + dy));
+        if (isEligibleMove(currentX, currentY + dy)) {
+          neighbours[0] = new Node(current, currentX, currentY + dy);
         }
-        if (!isEligibleMove(nx + 1, ny)) {
-          neighbours.add(new Node(current, nx + 1, ny + dy));
+        if (!isEligibleMove(currentX + 1, currentY)) {
+          neighbours[1] = new Node(current, currentX + 1, currentY + dy);
         }
-        if (!isEligibleMove(nx - 1, ny)) {
-          neighbours.add(new Node(current, nx - 1, ny + dy));
+        if (!isEligibleMove(currentX - 1, currentY)) {
+          neighbours[2] = new Node(current, currentX - 1, currentY + dy);
         }
       } else {
-        if (isEligibleMove(nx + dx, ny)) {
-          neighbours.add(new Node(current, nx + dx, ny));
+        if (isEligibleMove(currentX + dx, currentY)) {
+          neighbours[0] = new Node(current, currentX + dx, currentY);
         }
-        if (!isEligibleMove(nx, ny + 1)) {
-          neighbours.add(new Node(current, nx + dx, ny + 1));
+        if (!isEligibleMove(currentX, currentY + 1)) {
+          neighbours[1] = new Node(current, currentX + dx, currentY + 1);
         }
-        if (!isEligibleMove(nx, ny - 1)) {
-          neighbours.add(new Node(current, nx + dx, ny - 1));
+        if (!isEligibleMove(currentX, currentY - 1)) {
+          neighbours[2] = new Node(current, currentX + dx, currentY - 1);
         }
       }
     }
     return neighbours;
   }
 
-  @Override
-  public void addNeighbours(Node current) {
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        int newX = current.posX + x;
-        int newY = current.posY + y;
+  /**
+   * Evaluates a node.
+   *
+   * <p>Calculates f(x) = g(x) + h(x), where g(x) is the current movement cost up to this point and
+   * h(x) is the approximation (heuristic) of the cost to reach the end from this point.
+   *
+   * @param current Current node
+   * @param neighbour Neighbour node
+   */
+  protected void addNeighbour(Node current, Node neighbour) {
+    int nextX = neighbour.getPosX();
+    int nextY = neighbour.getPosY();
 
-        if (x == 0 && y == 0) {
-          continue;
-        }
-
-        if (!isEligibleMove(newX, newY)) {
-          continue;
-        }
-        if (current.parent == null) {
-          float movementCost = (x != 0 && y != 0) ? 1.42f : 1f;
-          Node neighbour = new Node(current, newX, newY);
-
-          if (closed.contains(neighbour)) {
-            continue;
-          }
-
-          float currentCost = gscores.getOrDefault(neighbour, 0f);
-          float newCost = currentCost + movementCost;
-          neighbour.scoreF = newCost + distance(neighbour.posX, neighbour.posY);
-          open.add(neighbour);
-          gscores.put(neighbour, newCost);
-        } else {
-          int dx = normalize(newX, current.posX);
-          int dy = normalize(newY, current.posY);
-          Node jump = jumpSuccessor(current, newX, newY, dx, dy);
-          if (jump == null) {
-            continue;
-          }
-
-          if (closed.contains(jump)) {
-            continue;
-          }
-
-          float movementCost = (dx != 0 && dy != 0) ? 1.42f : 1f;
-          float currentCost = gscores.getOrDefault(jump, 0f);
-          float newCost = currentCost + movementCost;
-
-          if (!open.contains(jump) || newCost < currentCost) {
-            gscores.put(jump, newCost);
-            jump.scoreF = newCost + distance(jump.posX, jump.posY);
-            open.add(jump);
-          }
-        }
-      }
+    int dx = normalize(current.getPosX(), neighbour.getPosX());
+    int dy = normalize(current.getPosY(), neighbour.getPosY());
+    Node jump = jumpSuccessor(current, nextX, nextY, dx, dy);
+    if (jump == null) {
+      return;
     }
+
+    super.addNeighbour(current, jump);
   }
 
-  public int normalize(int to, int from) {
+  /**
+   * Get normalized direction of two points.
+   *
+   * @param from Coordinate from
+   * @param to Coordinate to
+   * @return Return an integer, e.g. -1, 0, 1, depending on direction.
+   */
+  private int normalize(int from, int to) {
     return (to - from) / Math.max(Math.abs(to - from), 1);
   }
 }
