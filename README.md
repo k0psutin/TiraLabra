@@ -19,3 +19,5 @@ User guide
 [Week 1](/docs/week1.md)
 
 [Week 2](/docs/week2.md)
+
+[Week 3](/docs/week3.md)
