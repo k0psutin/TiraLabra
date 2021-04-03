@@ -46,7 +46,6 @@ public class AstarTest {
   @Test
   public void testPathNotFound() {
     astar = new Astar(38, 111, 52, 121, loadImage("brc000d.png", 150));
-    astar.timeout = 200;
     String answer = astar.findPath();
     assertTrue("Expected ''Timeout.'' but was " + answer, answer.contains("No solution."));
   }

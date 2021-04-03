@@ -107,7 +107,6 @@ public class JpsTest {
   @Test
   public void testPathNotFound() {
     jps = new Jps(38, 111, 52, 121, loadImage("brc000d.png", 150));
-    jps.timeout = 200;
     String answer = jps.findPath();
     assertTrue("Expected ''Timeout.'' but was " + answer, answer.contains("No solution."));
   }
