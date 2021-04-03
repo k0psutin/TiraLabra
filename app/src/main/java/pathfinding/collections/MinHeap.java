@@ -150,4 +150,8 @@ public class MinHeap {
   public int size() {
     return size;
   }
+
+  public Node[] getHeap() {
+    return this.heap;
+  }
 }

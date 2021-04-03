@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 import pathfinding.solvers.Astar;
+import pathfinding.solvers.Ida;
 import pathfinding.solvers.Jps;
 
 public class Gui implements Runnable {
@@ -45,7 +46,7 @@ public class Gui implements Runnable {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
 
-  private final int imgSize = 800;
+  private final int imgSize = 150;
   private final int panelImgSize = 800;
   private final float factor = ((float) panelImgSize / (float) imgSize);
 
@@ -117,7 +118,9 @@ public class Gui implements Runnable {
               solveTime.setText(jps.findPath());
               newMap = jps.getMap();
             } else if (comboBox.getSelectedItem().equals("IDA*")) {
-              return;
+              Ida ida = new Ida(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
+              solveTime.setText(ida.findPath());
+              newMap = ida.getMap();
             }
             if (newMap == null) {
               return;

@@ -26,7 +26,6 @@ public class Astar {
 
   public boolean hasSolution = false;
 
-  public long timeout = 5000;
   public final double sqrtTwo = Math.sqrt(2);
 
   /**
