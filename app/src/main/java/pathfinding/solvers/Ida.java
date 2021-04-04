@@ -5,11 +5,12 @@ import static pathfinding.tools.ImgTools.setPixelColor;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 import pathfinding.collections.MinHeap;
 import pathfinding.entities.Node;
 
-/** Class for Iterative Deepening Astar. */
+/** Class for Iterative Deepening A*. */
 public class Ida extends Astar {
 
   private Instant start;
@@ -30,67 +31,86 @@ public class Ida extends Astar {
     double threshold = distance(startX, startY, endX, endY);
     Node startNode = new Node(null, startX, startY);
     Node endNode = new Node(null, endX, endY);
-    Stack<Node> path = new Stack<>();
-    open.add(startNode);
+    List<Node> path = new ArrayList<>();
     start = Instant.now();
     while (true) {
+      open = new MinHeap();
+      open.add(startNode);
+      closed = new boolean[map.getWidth() + 1][map.getHeight() + 1];
       double temp = search(path, endNode, 0, threshold);
       if (temp == 0) {
         return "Timeout.";
       }
       if (temp < 0) {
-        hasSolution = true;
         path.add(startNode);
-        break;
+        Instant end = Instant.now();
+        for (Node node : path) {
+          setPixelColor(node.getPosX(), node.getPosY(), 255, 0, 0, map);
+        }
+        return "Path found in " + Duration.between(start, end).toMillis() + "ms. ";
       }
       if (temp == 999999999) {
-        break;
+        return "No solution.";
       }
 
       threshold = temp;
     }
-    Instant end = Instant.now();
-    if (hasSolution) {
-      while (!path.isEmpty()) {
-        Node node = path.pop();
-        setPixelColor(node.getPosX(), node.getPosY(), 255, 0, 0, map);
-      }
-    }
-    String solution =
-        (hasSolution)
-            ? "Path found in " + Duration.between(start, end).toMillis() + "ms. "
-            : "No solution.";
-
-    return solution;
   }
 
-  private double search(Stack<Node> path, Node endNode, double g, double threshold) {
-    Node node = null;
-    if (!open.isEmpty()) {
-      node = open.poll();
-    } else {
+  private MinHeap successors(Node current, double movementCost) {
+    MinHeap minHeap = new MinHeap();
+
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        if (x == 0 && y == 0) {
+          continue;
+        }
+        Node node = new Node(current, current.getPosX() + x, current.getPosY() + y);
+        node.setTotalCost(movementCost + distance(node.getPosX(), node.getPosY(), endX, endY));
+        minHeap.add(node);
+      }
+    }
+    return minHeap;
+  }
+
+  private double search(List<Node> path, Node endNode, double currentCost, double threshold) {
+    if (open.isEmpty()) {
       return 0;
     }
-    double f = g + distance(node.getPosX(), node.getPosY(), endNode.getPosX(), endNode.getPosY());
+    Node node = open.poll();
+    double f =
+        currentCost
+            + distance(node.getPosX(), node.getPosY(), endNode.getPosX(), endNode.getPosY());
     Instant runtime = Instant.now();
-    if (Duration.between(start, runtime).toMillis() > 1000) {
+    if (Duration.between(start, runtime).toMillis() > 5000) {
       return 0;
     }
     if (f > threshold) {
-      return f;
+      return f + 1;
     }
     if (node.getPosX() == endNode.getPosX() && node.getPosY() == endNode.getPosY()) {
       return -f;
     }
     double min = 999999999;
-    MinHeap neighbours = expand(node, g);
+    MinHeap neighbours = successors(node, currentCost);
     while (!neighbours.isEmpty()) {
       Node next = neighbours.poll();
       int nextX = next.getPosX();
       int nextY = next.getPosY();
-      double newCost = g + distance(node.getPosX(), node.getPosY(), nextX, nextY);
+      if (!isEligibleMove(nextX, nextY)) {
+        continue;
+      }
+      if (closed[nextX][nextY]) {
+        continue;
+      }
+      closed[nextX][nextY] = true;
+
+      double newCost = currentCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
+
+      next.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
       open.add(next);
       double temp = search(path, endNode, newCost, threshold);
+
       if (temp == 0) {
         return 0;
       }
@@ -103,25 +123,5 @@ public class Ida extends Astar {
       }
     }
     return min;
-  }
-
-  private MinHeap expand(Node node, double movementCost) {
-    MinHeap minHeap = new MinHeap();
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        if (x == 0 && y == 0) {
-          continue;
-        }
-        int newX = node.getPosX() + x;
-        int newY = node.getPosY() + y;
-        double cost = (x != 0 && y != 0) ? sqrtTwo : 1;
-        if (isEligibleMove(newX, newY)) {
-          Node next = new Node(node, newX, newY);
-          next.setTotalCost(movementCost + cost);
-          minHeap.add(next);
-        }
-      }
-    }
-    return minHeap;
   }
 }
