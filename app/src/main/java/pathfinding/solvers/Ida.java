@@ -14,6 +14,7 @@ import pathfinding.entities.Node;
 public class Ida extends Astar {
 
   private Instant start;
+  public float timeout = 5000;
 
   public Ida(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
@@ -82,7 +83,7 @@ public class Ida extends Astar {
         currentCost
             + distance(node.getPosX(), node.getPosY(), endNode.getPosX(), endNode.getPosY());
     Instant runtime = Instant.now();
-    if (Duration.between(start, runtime).toMillis() > 5000) {
+    if (Duration.between(start, runtime).toMillis() > timeout) {
       return 0;
     }
     if (f > threshold) {
