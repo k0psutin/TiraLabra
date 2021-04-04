@@ -15,4 +15,3 @@ I've done IDA\* according to the pseudo code. It runs well when there are no obs
 ## What should I do next
 
 I should study why IDA\* isn't working properly when facing an obstacle. Perhaps I need a tiebreaker?
-
