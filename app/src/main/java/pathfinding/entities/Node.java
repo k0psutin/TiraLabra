@@ -49,6 +49,10 @@ public class Node implements Comparable<Node> {
     return this.parent;
   }
 
+  public void setParent(Node parent) {
+    this.parent = parent;
+  }
+
   @Override
   public int compareTo(Node o) {
     return (totalCost < o.totalCost) ? -1 : (o.totalCost < totalCost) ? 1 : 0;

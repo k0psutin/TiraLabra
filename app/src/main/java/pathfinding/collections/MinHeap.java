@@ -133,9 +133,9 @@ public class MinHeap {
   }
 
   /**
-   * Returns the Node that has the minimum totalCost.
+   * Returns the Node that has the smallest totalCost.
    *
-   * @return {@value}
+   * @return Node with the smallest totalCost (f(x)).
    */
   @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
   public Node poll() {

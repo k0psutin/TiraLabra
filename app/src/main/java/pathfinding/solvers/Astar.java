@@ -184,11 +184,13 @@ public class Astar {
       // setPixelColor(nextX, nextY, 124, 255, 110, this.map);
       travelCosts[nextX][nextY] = newCost;
       neighbour.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
+      neighbour.setParent(current);
       open.add(neighbour);
       return;
     } else if (newCost < currentCost) {
       travelCosts[nextX][nextY] = newCost;
       neighbour.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
+      neighbour.setParent(current);
       open.add(neighbour);
       return;
     }

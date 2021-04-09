@@ -148,8 +148,10 @@ public class Jps extends Astar {
     int nextX = neighbour.getPosX();
     int nextY = neighbour.getPosY();
 
+    // Use the direction of the parent to guide the expanded node.
     int dx = normalize(current.getPosX(), neighbour.getPosX());
     int dy = normalize(current.getPosY(), neighbour.getPosY());
+
     Node jump = jumpSuccessor(current, nextX, nextY, dx, dy);
     if (jump == null) {
       return;

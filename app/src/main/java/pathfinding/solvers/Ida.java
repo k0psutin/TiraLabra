@@ -1,12 +1,8 @@
 package pathfinding.solvers;
 
-import static pathfinding.tools.ImgTools.setPixelColor;
-
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import pathfinding.collections.MinHeap;
 import pathfinding.entities.Node;
 
@@ -14,6 +10,8 @@ import pathfinding.entities.Node;
 public class Ida extends Astar {
 
   private Instant start;
+  private Node endNode;
+
   public float timeout = 5000;
 
   public Ida(int startX, int startY, int endX, int endY, BufferedImage map) {
@@ -30,37 +28,36 @@ public class Ida extends Astar {
     }
 
     double threshold = distance(startX, startY, endX, endY);
-    Node startNode = new Node(null, startX, startY);
-    Node endNode = new Node(null, endX, endY);
-    List<Node> path = new ArrayList<>();
     start = Instant.now();
     while (true) {
-      open = new MinHeap();
-      open.add(startNode);
-      closed = new boolean[map.getWidth() + 1][map.getHeight() + 1];
-      double temp = search(path, endNode, 0, threshold);
-      if (temp == 0) {
+      open.add(new Node(null, startX, startY));
+      double solution = search(0, threshold);
+      if (solution == 0) {
         return "Timeout.";
       }
-      if (temp < 0) {
-        path.add(startNode);
+      if (solution < 0) {
         Instant end = Instant.now();
-        for (Node node : path) {
-          setPixelColor(node.getPosX(), node.getPosY(), 255, 0, 0, map);
-        }
+        drawPath(endNode);
         return "Path found in " + Duration.between(start, end).toMillis() + "ms. ";
       }
-      if (temp == 999999999) {
+      if (solution == Double.POSITIVE_INFINITY) {
         return "No solution.";
       }
-
-      threshold = temp;
+      closed = new boolean[map.getWidth() + 1][map.getHeight() + 1];
+      threshold = solution;
     }
   }
 
+  /**
+   * Returns node successor array sorted by f(x) = g(x) + h(x), where g(x) = movement cost so far
+   * and h(x) is the cost approximation (heuristic) from current position to the end.
+   *
+   * @param current Node to be expanded
+   * @param movementCost Movement cost so far, g(x)
+   * @return Minimum Heap with successors
+   */
   private MinHeap successors(Node current, double movementCost) {
     MinHeap minHeap = new MinHeap();
-
     for (int x = -1; x <= 1; x++) {
       for (int y = -1; y <= 1; y++) {
         if (x == 0 && y == 0) {
@@ -74,55 +71,56 @@ public class Ida extends Astar {
     return minHeap;
   }
 
-  private double search(List<Node> path, Node endNode, double currentCost, double threshold) {
-    if (open.isEmpty()) {
-      return 0;
-    }
+  /**
+   * Recursive deepening function with a upper bound threshold.
+   *
+   * @param currentCost Movement cost so far
+   * @param threshold Upper bound for total movement cost f(x) = g(x) + h(x)
+   * @return 0 if path finding takes too much time, f(x) + 1 if current upperbound is breached or
+   *     -f(x) if goal is found.
+   */
+  private double search(double currentCost, double threshold) {
     Node node = open.poll();
-    double f =
-        currentCost
-            + distance(node.getPosX(), node.getPosY(), endNode.getPosX(), endNode.getPosY());
+    double f = currentCost + distance(node.getPosX(), node.getPosY(), endX, endY);
     Instant runtime = Instant.now();
     if (Duration.between(start, runtime).toMillis() > timeout) {
       return 0;
     }
     if (f > threshold) {
+      // By enlarging the threshold by 1, we can eliminate ties when facing an obstacle.
       return f + 1;
     }
-    if (node.getPosX() == endNode.getPosX() && node.getPosY() == endNode.getPosY()) {
+    if (node.getPosX() == endX && node.getPosY() == endY) {
+      this.endNode = node;
       return -f;
     }
-    double min = 999999999;
+    double minimum = Double.POSITIVE_INFINITY;
     MinHeap neighbours = successors(node, currentCost);
     while (!neighbours.isEmpty()) {
       Node next = neighbours.poll();
       int nextX = next.getPosX();
       int nextY = next.getPosY();
-      if (!isEligibleMove(nextX, nextY)) {
-        continue;
-      }
-      if (closed[nextX][nextY]) {
+
+      if (!isEligibleMove(nextX, nextY) || closed[nextX][nextY]) {
         continue;
       }
       closed[nextX][nextY] = true;
 
       double newCost = currentCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
-
       next.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
       open.add(next);
-      double temp = search(path, endNode, newCost, threshold);
 
-      if (temp == 0) {
+      double solution = search(newCost, threshold);
+
+      if (solution == 0) {
         return 0;
       }
-      if (temp < 0) {
-        path.add(node);
+      if (solution < 0) {
+        next.setParent(node);
         return -f;
       }
-      if (temp < min) {
-        min = temp;
-      }
+      minimum = Math.min(solution, minimum);
     }
-    return min;
+    return minimum;
   }
 }
