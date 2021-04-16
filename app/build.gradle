@@ -19,7 +19,7 @@ jacocoTestReport {
     }
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/pathfinding/ui/**', '**/pathfinding/main/**', '**/pathfinding/tools/ImgTools.java'])
+            fileTree(dir: it, exclude: ['**/pathfinding/ui/**', '**/pathfinding/main/**', '**/pathfinding/tools/ImgTools.java', '**/pathfinding/data/**'])
         }))
     }
 }
@@ -31,6 +31,7 @@ checkstyle {
 dependencies {
     testImplementation 'junit:junit:4.13'
     implementation 'com.google.guava:guava:29.0-jre'
+    implementation group: 'org.json', name: 'json', version: '20210307'
 }
 
 application {
