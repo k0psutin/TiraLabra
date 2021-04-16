@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
+import pathfinding.data.PerformanceTests;
 import pathfinding.solvers.Astar;
 import pathfinding.solvers.Ida;
 import pathfinding.solvers.Jps;
@@ -55,7 +56,6 @@ public class Gui implements Runnable {
 
     frame = new JFrame("Pathfinding");
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     buffImg = loadImage(file, imgSize);
 
     JPanel panel = new JPanel();
@@ -142,6 +142,17 @@ public class Gui implements Runnable {
             buffImg = resizeImage(panelImgSize, panelImgSize, buffImg);
             imageIcon.setImage(buffImg);
             picPanel.repaint();
+          }
+        });
+
+    JButton runTests = new JButton("Run tests");
+    panel.add(runTests);
+    runTests.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            PerformanceTests tests = new PerformanceTests();
+            tests.runTests();
           }
         });
 
