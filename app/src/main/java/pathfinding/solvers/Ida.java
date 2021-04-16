@@ -7,12 +7,12 @@ import pathfinding.collections.MinHeap;
 import pathfinding.entities.Node;
 
 /** Class for Iterative Deepening A*. */
-public class Ida extends Astar {
+public class Ida extends Pathfinding {
 
   private Instant start;
   private Node endNode;
 
-  public float timeout = 5000;
+  private int[][] visited;
 
   public Ida(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
@@ -30,21 +30,22 @@ public class Ida extends Astar {
     double threshold = distance(startX, startY, endX, endY);
     start = Instant.now();
     while (true) {
+      visited = new int[map.getWidth() + 1][map.getHeight() + 1];
+      visitedNodes = 0;
       open.add(new Node(null, startX, startY));
-      double solution = search(0, threshold);
-      if (solution == 0) {
+      threshold = search(0, threshold);
+      if (threshold == 0) {
         return "Timeout.";
       }
-      if (solution < 0) {
+      if (threshold < 0) {
         Instant end = Instant.now();
         drawPath(endNode);
-        return "Path found in " + Duration.between(start, end).toMillis() + "ms. ";
+        endTime = (int) Duration.between(start, end).toMillis();
+        return "Path found in " + endTime + "ms. ";
       }
-      if (solution == Double.POSITIVE_INFINITY) {
+      if (threshold == Double.POSITIVE_INFINITY) {
         return "No solution.";
       }
-      closed = new boolean[map.getWidth() + 1][map.getHeight() + 1];
-      threshold = solution;
     }
   }
 
@@ -79,37 +80,41 @@ public class Ida extends Astar {
    * @return 0 if path finding takes too much time, f(x) + 1 if current upperbound is breached or
    *     -f(x) if goal is found.
    */
-  private double search(double currentCost, double threshold) {
+  private double search(double movementCost, double threshold) {
     Node node = open.poll();
-    double f = currentCost + distance(node.getPosX(), node.getPosY(), endX, endY);
+    double f = movementCost + distance(node.getPosX(), node.getPosY(), endX, endY);
     Instant runtime = Instant.now();
     if (Duration.between(start, runtime).toMillis() > timeout) {
       return 0;
     }
     if (f > threshold) {
-      // By enlarging the threshold by 1, we can eliminate ties when facing an obstacle.
-      return f + 1;
+      return f;
     }
     if (node.getPosX() == endX && node.getPosY() == endY) {
       this.endNode = node;
       return -f;
     }
     double minimum = Double.POSITIVE_INFINITY;
-    MinHeap neighbours = successors(node, currentCost);
+    MinHeap neighbours = successors(node, movementCost);
     while (!neighbours.isEmpty()) {
       Node next = neighbours.poll();
       int nextX = next.getPosX();
       int nextY = next.getPosY();
 
-      if (!isEligibleMove(nextX, nextY) || closed[nextX][nextY]) {
+      if (visited[nextX][nextY] == 1) {
         continue;
       }
-      closed[nextX][nextY] = true;
+      if (!isEligibleMove(nextX, nextY)) {
+        continue;
+      }
 
-      double newCost = currentCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
+      visited[nextX][nextY] = 1;
+
+      visitedNodes++;
+
+      double newCost = movementCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
       next.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
       open.add(next);
-
       double solution = search(newCost, threshold);
 
       if (solution == 0) {
@@ -119,7 +124,7 @@ public class Ida extends Astar {
         next.setParent(node);
         return -f;
       }
-      minimum = Math.min(solution, minimum);
+      minimum = (solution < minimum) ? solution : minimum;
     }
     return minimum;
   }

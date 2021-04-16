@@ -1,7 +1,5 @@
 package pathfinding.solvers;
 
-import static pathfinding.tools.ImgTools.drawLine;
-
 import java.awt.image.BufferedImage;
 import pathfinding.entities.Node;
 import pathfinding.interfaces.Generated;
@@ -12,16 +10,6 @@ public class Jps extends Astar {
   @Generated
   public Jps(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
-  }
-
-  @Generated
-  protected void drawPath(Node current) {
-    Node previous = null;
-    while (current.getPosX() != startX || current.getPosY() != startY) {
-      previous = current;
-      current = current.getParent();
-      drawLine(previous.getPosX(), previous.getPosY(), current.getPosX(), current.getPosY(), map);
-    }
   }
 
   /**
@@ -168,6 +156,9 @@ public class Jps extends Astar {
    * @return Return an integer, e.g. -1, 0, 1, depending on direction.
    */
   private int normalize(int from, int to) {
-    return (to - from) / Math.max(Math.abs(to - from), 1);
+    int sub = (to - from);
+    int abs = sub > 0 ? sub : -sub;
+    int max = abs > 1 ? abs : 1;
+    return sub / max;
   }
 }

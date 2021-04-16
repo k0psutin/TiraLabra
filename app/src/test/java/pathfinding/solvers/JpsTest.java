@@ -108,6 +108,6 @@ public class JpsTest {
   public void testPathNotFound() {
     jps = new Jps(38, 111, 52, 121, loadImage("brc000d.png", 150));
     String answer = jps.findPath();
-    assertTrue("Expected ''Timeout.'' but was " + answer, answer.contains("No solution."));
+    assertTrue("Expected ''No solution.'' but was " + answer, answer.contains("No solution."));
   }
 }
