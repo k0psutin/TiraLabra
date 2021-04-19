@@ -32,8 +32,7 @@ public class Ida extends Pathfinding {
     while (true) {
       visited = new int[map.getWidth() + 1][map.getHeight() + 1];
       visitedNodes = 0;
-      open.add(new Node(null, startX, startY));
-      threshold = search(0, threshold);
+      threshold = search(new Node(null, startX, startY), 0, threshold);
       if (threshold == 0) {
         return "Timeout.";
       }
@@ -80,8 +79,7 @@ public class Ida extends Pathfinding {
    * @return 0 if path finding takes too much time, f(x) + 1 if current upperbound is breached or
    *     -f(x) if goal is found.
    */
-  private double search(double movementCost, double threshold) {
-    Node node = open.poll();
+  private double search(Node node, double movementCost, double threshold) {
     double f = movementCost + distance(node.getPosX(), node.getPosY(), endX, endY);
     Instant runtime = Instant.now();
     if (Duration.between(start, runtime).toMillis() > timeout) {
@@ -114,8 +112,7 @@ public class Ida extends Pathfinding {
 
       double newCost = movementCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
       next.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
-      open.add(next);
-      double solution = search(newCost, threshold);
+      double solution = search(next, newCost, threshold);
 
       if (solution == 0) {
         return 0;

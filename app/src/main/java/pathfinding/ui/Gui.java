@@ -24,6 +24,7 @@ import pathfinding.data.PerformanceTests;
 import pathfinding.solvers.Astar;
 import pathfinding.solvers.Ida;
 import pathfinding.solvers.Jps;
+import pathfinding.solvers.Pathfinding;
 
 public class Gui implements Runnable {
 
@@ -107,21 +108,32 @@ public class Gui implements Runnable {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            BufferedImage newMap = null;
-            if (comboBox.getSelectedItem().equals("A*")) {
-              Astar astar =
-                  new Astar(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
-              solveTime.setText(astar.findPath());
-              newMap = astar.getMap();
-            } else if (comboBox.getSelectedItem().equals("JPS")) {
-              Jps jps = new Jps(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
-              solveTime.setText(jps.findPath());
-              newMap = jps.getMap();
-            } else if (comboBox.getSelectedItem().equals("IDA*")) {
-              Ida ida = new Ida(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
-              solveTime.setText(ida.findPath());
-              newMap = ida.getMap();
+            Pathfinding solve = null;
+
+            String type = comboBox.getSelectedItem().toString();
+            switch (type) {
+              case "A*":
+                solve =
+                    new Astar(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
+                break;
+              case "JPS":
+                solve = new Jps(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
+                break;
+              case "IDA*":
+                solve = new Ida(startX, startY, endX, endY, resizeImage(imgSize, imgSize, buffImg));
+                break;
+              default:
+                solve = null;
+                break;
             }
+
+            if (solve == null) {
+              return;
+            }
+
+            solveTime.setText(solve.findPath());
+            BufferedImage newMap = solve.getMap();
+
             if (newMap == null) {
               return;
             }
