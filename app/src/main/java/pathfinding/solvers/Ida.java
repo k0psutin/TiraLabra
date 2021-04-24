@@ -9,9 +9,7 @@ import pathfinding.entities.Node;
 /** Class for Iterative Deepening A*. */
 public class Ida extends Pathfinding {
 
-  private Instant start;
   private Node endNode;
-
   private int[][] visited;
 
   public Ida(int startX, int startY, int endX, int endY, BufferedImage map) {
@@ -27,24 +25,27 @@ public class Ida extends Pathfinding {
       return "End position not reachable.";
     }
 
-    double threshold = distance(startX, startY, endX, endY);
+    double bound = distance(startX, startY, endX, endY);
+    int depth = 1;
+    visited = new int[map.getWidth() + 1][map.getHeight() + 1];
     start = Instant.now();
+
     while (true) {
-      visited = new int[map.getWidth() + 1][map.getHeight() + 1];
-      visitedNodes = 0;
-      threshold = search(new Node(null, startX, startY), 0, threshold);
-      if (threshold == 0) {
+      bound = search(new Node(null, startX, startY), 0, bound, depth);
+      if (bound == 0) {
         return "Timeout.";
       }
-      if (threshold < 0) {
+      if (bound < 0) {
         Instant end = Instant.now();
-        drawPath(endNode);
         endTime = (int) Duration.between(start, end).toMillis();
+        drawPath(endNode);
         return "Path found in " + endTime + "ms. ";
       }
-      if (threshold == Double.POSITIVE_INFINITY) {
+      if (bound == Double.POSITIVE_INFINITY) {
         return "No solution.";
       }
+      depth++;
+      visitedNodes = 0;
     }
   }
 
@@ -53,18 +54,33 @@ public class Ida extends Pathfinding {
    * and h(x) is the cost approximation (heuristic) from current position to the end.
    *
    * @param current Node to be expanded
-   * @param movementCost Movement cost so far, g(x)
+   * @param currCost Movement cost so far, g(x)
+   * @param depth Current depth
    * @return Minimum Heap with successors
    */
-  private MinHeap successors(Node current, double movementCost) {
+  private MinHeap successors(Node current, double currCost, int depth) {
     MinHeap minHeap = new MinHeap();
     for (int x = -1; x <= 1; x++) {
       for (int y = -1; y <= 1; y++) {
-        if (x == 0 && y == 0) {
+        if ((x == 0 && y == 0)) {
           continue;
         }
-        Node node = new Node(current, current.getPosX() + x, current.getPosY() + y);
-        node.setTotalCost(movementCost + distance(node.getPosX(), node.getPosY(), endX, endY));
+
+        int currX = current.getPosX();
+        int currY = current.getPosY();
+        int nextX = currX + x;
+        int nextY = currY + y;
+
+        if (visited[nextX][nextY] == depth) {
+          continue;
+        }
+
+        if (!isEligibleMove(nextX, nextY)) {
+          continue;
+        }
+
+        Node node = new Node(current, nextX, nextY);
+        node.setTotalCost(currCost + distance(node.getPosX(), node.getPosY(), endX, endY));
         minHeap.add(node);
       }
     }
@@ -72,57 +88,56 @@ public class Ida extends Pathfinding {
   }
 
   /**
-   * Recursive deepening function with a upper bound threshold.
+   * Recursive deepening function with a upper bound bound.
    *
+   * @param node Current node
    * @param currentCost Movement cost so far
-   * @param threshold Upper bound for total movement cost f(x) = g(x) + h(x)
+   * @param bound Upper bound for total movement cost f(x) = g(x) + h(x)
+   * @param depth Current depth
    * @return 0 if path finding takes too much time, f(x) + 1 if current upperbound is breached or
    *     -f(x) if goal is found.
    */
-  private double search(Node node, double movementCost, double threshold) {
-    double f = movementCost + distance(node.getPosX(), node.getPosY(), endX, endY);
+  private double search(Node node, double currCost, double bound, int depth) {
+    double h = distance(node.getPosX(), node.getPosY(), endX, endY);
+    double f = currCost + h;
     Instant runtime = Instant.now();
-    if (Duration.between(start, runtime).toMillis() > timeout) {
+    if (Duration.between(start, runtime).toMillis() >= timeout) {
       return 0;
     }
-    if (f > threshold) {
+
+    if (f > bound) {
       return f;
     }
-    if (node.getPosX() == endX && node.getPosY() == endY) {
+
+    if (h == 0) {
       this.endNode = node;
       return -f;
     }
-    double minimum = Double.POSITIVE_INFINITY;
-    MinHeap neighbours = successors(node, movementCost);
+
+    double newBound = Double.POSITIVE_INFINITY;
+    MinHeap neighbours = successors(node, currCost, depth);
     while (!neighbours.isEmpty()) {
       Node next = neighbours.poll();
       int nextX = next.getPosX();
       int nextY = next.getPosY();
 
-      if (visited[nextX][nextY] == 1) {
-        continue;
-      }
-      if (!isEligibleMove(nextX, nextY)) {
-        continue;
-      }
+      double newCost = currCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
 
-      visited[nextX][nextY] = 1;
-
+      visited[nextX][nextY] = depth;
       visitedNodes++;
 
-      double newCost = movementCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
       next.setTotalCost(newCost + distance(nextX, nextY, endX, endY));
-      double solution = search(next, newCost, threshold);
+      double nextBound = search(next, newCost, bound, depth);
 
-      if (solution == 0) {
+      if (nextBound == 0) {
         return 0;
       }
-      if (solution < 0) {
+      if (nextBound < 0) {
         next.setParent(node);
         return -f;
       }
-      minimum = (solution < minimum) ? solution : minimum;
+      newBound = (nextBound < newBound) ? nextBound : newBound;
     }
-    return minimum;
+    return newBound;
   }
 }

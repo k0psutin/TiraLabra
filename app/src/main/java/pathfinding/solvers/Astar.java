@@ -34,14 +34,14 @@ public class Astar extends Pathfinding {
 
     open.add(current);
     travelCosts[startX][startY] = 0;
-    Instant start = Instant.now();
+    start = Instant.now();
     while (!open.isEmpty()) {
       current = open.poll();
       // setPixelColor(current.getPosX(), current.getPosY(), 150, 208, 255, this.map);
       if (current.getPosX() == endX && current.getPosY() == endY) {
         Instant end = Instant.now();
-        drawPath(current);
         endTime = (int) Duration.between(start, end).toMillis();
+        drawPath(current);
         return "Path found in " + endTime + "ms. ";
       }
       Instant runtime = Instant.now();

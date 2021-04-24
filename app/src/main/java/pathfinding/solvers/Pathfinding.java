@@ -4,6 +4,7 @@ import static pathfinding.tools.ImgTools.drawLine;
 import static pathfinding.tools.ImgTools.getPixelColor;
 
 import java.awt.image.BufferedImage;
+import java.time.Instant;
 import pathfinding.collections.MinHeap;
 import pathfinding.entities.Node;
 import pathfinding.interfaces.Generated;
@@ -25,7 +26,9 @@ public abstract class Pathfinding {
   protected double pathCost = 0;
   protected int endTime = 0;
 
-  protected float timeout = 5000;
+  protected float timeout = 10000;
+
+  protected Instant start;
 
   protected final double sqrtTwo = Math.sqrt(2);
 
