@@ -14,7 +14,7 @@ Datastructures and algorithms course project, University of Helsinki. Written in
 
 [Testing documentation](/docs/proj_testing.md)
 
-User guide
+[User guide](/docs/user_guide.md)
 
 ## Weekly reports
 
@@ -25,3 +25,5 @@ User guide
 [Week 3](/docs/week3.md)
 
 [Week 4](/docs/week4.md)
+
+[Week 5](/docs/week5.md)
