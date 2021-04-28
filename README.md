@@ -27,3 +27,5 @@ Datastructures and algorithms course project, University of Helsinki. Written in
 [Week 4](/docs/week4.md)
 
 [Week 5](/docs/week5.md)
+
+[Week 6](/docs/week6.md)
