@@ -69,11 +69,21 @@ public class ImgTools {
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   @Generated
-  public static void drawLine(int x, int y, int x2, int y2, BufferedImage image) {
+  public static void drawLine(int x, int y, int x2, int y2, BufferedImage image, Color color) {
     Graphics2D graph = image.createGraphics();
-    graph.setColor(new Color(255, 0, 0));
+    graph.setColor(color);
     graph.setStroke(new BasicStroke(1));
     graph.drawLine(x, y, x2, y2);
+    graph.dispose();
+  }
+
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  @Generated
+  public static void drawCircle(int x, int y, Color color, BufferedImage image) {
+    Graphics2D graph = image.createGraphics();
+    graph.setColor(color);
+    graph.setStroke(new BasicStroke(1));
+    graph.fillOval(x - 5, y - 5, 10, 10);
     graph.dispose();
   }
 }
