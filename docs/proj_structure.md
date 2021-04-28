@@ -2,7 +2,7 @@
 
 Project follows a 2-layer architecture and consists of following packages:
 
-![packages.png](packages.png)
+![packages.png](/docs/images/packages.png)
 
 Package _ui_ holds program user interface related code, _tools_ image manipulation related code, _solvers_ pathfinding related code, _data_ performance testing related code, _collections_ data structure related code and _entites_ object oriented classes, such as [Node](app/src/main/java/pathfinding/entities/Node.java).
 
@@ -12,7 +12,7 @@ Program core functionality consists of classes `A*`, `IDA*` and `JPS` of which `
 
 Program also includes `PerformanceTests` class which is responsible for running various performance related tests. The class also creates a markdown file which includes all the test results.
 
-![classes.png](classes.png)
+![classes.png](/docs/images/classes.png)
 
 ## Time and Space complexities of data structures
 

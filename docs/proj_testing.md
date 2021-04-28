@@ -54,7 +54,7 @@ Maps with size of 800x800 were used for all tests with three different start and
 
 ### Test 1: arena.png
 
-![arena.png](/docs/arena.png)
+![arena.png](/docs/images/arena.png)
 
 </br>
 
@@ -92,7 +92,7 @@ StartX: 100 StartY: 90 EndX: 700 EndY: 90
 
 ### Test 2: arena2.png
 
-![arena2.png](/docs/arena2.png)
+![arena2.png](/docs/images/arena2.png)
 
 </br>
 
@@ -130,7 +130,7 @@ StartX: 280 StartY: 130 EndX: 730 EndY: 225
 
 ### Test 3: orz103d.png
 
-![orz103d.png](/docs/orz103d.png)
+![orz103d.png](/docs/images/orz103d.png)
 
 </br>
 

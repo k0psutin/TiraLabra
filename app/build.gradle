@@ -4,6 +4,8 @@ plugins {
     id 'jacoco'
 }
 
+version = '1.0'
+
 repositories {
     jcenter()
 }
@@ -36,6 +38,17 @@ dependencies {
 
 application {
     mainClass = 'pathfinding.main.Main'
+}
+
+task packJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Tiralabra: Pathfinding',  
+        	'Implementation-Version': archiveVersion,
+        	'Main-Class': 'pathfinding.main.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
