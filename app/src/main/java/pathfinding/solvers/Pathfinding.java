@@ -3,6 +3,7 @@ package pathfinding.solvers;
 import static pathfinding.tools.ImgTools.drawLine;
 import static pathfinding.tools.ImgTools.getPixelColor;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
 import pathfinding.collections.MinHeap;
@@ -53,7 +54,13 @@ public abstract class Pathfinding {
     while (current.getPosX() != startX || current.getPosY() != startY) {
       previous = current;
       current = current.getParent();
-      drawLine(previous.getPosX(), previous.getPosY(), current.getPosX(), current.getPosY(), map);
+      drawLine(
+          previous.getPosX(),
+          previous.getPosY(),
+          current.getPosX(),
+          current.getPosY(),
+          map,
+          Color.RED);
     }
   }
 
