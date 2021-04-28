@@ -70,7 +70,7 @@ public class MinHeap {
   /**
    * Checks the tree for the given node. Returns true if found, false otherwise.
    *
-   * @param node {@value Node}
+   * @param node Node
    * @return true/false
    */
   public boolean contains(Node node) {

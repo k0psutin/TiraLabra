@@ -46,7 +46,7 @@ task packJar(type: Jar) {
         	'Implementation-Version': archiveVersion,
         	'Main-Class': 'pathfinding.main.Main'
     }
-    baseName = project.name + '-all'
+    archiveBaseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
