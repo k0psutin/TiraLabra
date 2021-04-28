@@ -4,6 +4,7 @@ import static pathfinding.tools.ImgTools.loadImage;
 
 import java.io.FileWriter;
 import java.io.InputStream;
+import javax.swing.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -18,9 +19,12 @@ public class PerformanceTests {
   private String[] paths = {"A*", "JPS", "IDA*"};
   private String results = "# Test results\n";
   private int reps = 10;
+  private int testsDone = 0;
+
+  private boolean isCanceled = false;
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public void runTests() {
+  public void runTests(ProgressMonitor pm) {
 
     JSONObject file = null;
     try {
@@ -72,12 +76,20 @@ public class PerformanceTests {
               break;
             }
           }
+          testsDone++;
+          isCanceled = pm.isCanceled();
+
+          if (isCanceled) {
+            return;
+          }
+          pm.setProgress(testsDone);
+          pm.setNote("Tests completed: " + testsDone);
           addResult(path, avgTime, avgNodes, avgCost, reps);
         }
       }
     }
     try {
-      FileWriter result = new FileWriter("results.md");
+      FileWriter result = new FileWriter("../results.md");
       result.write(results);
       result.close();
     } catch (Exception e) {
