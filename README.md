@@ -6,6 +6,8 @@ Datastructures and algorithms course project, University of Helsinki. Written in
 
 ![App picture](/docs/images/app.gif)
 
+This project implements the pathfinding algorithms A\*, Jump Point Search (JPS) and Iterative Deepening A\* (IDA\*) and compares their performances.
+
 ## Documentation
 
 [Project definition](/docs/proj_definition.md)
