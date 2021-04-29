@@ -4,7 +4,7 @@
 
 Datastructures and algorithms course project, University of Helsinki. Written in Java.
 
-![App picutre](/docs/images/app.png)
+![App picture](/docs/images/app.gif)
 
 ## Documentation
 
