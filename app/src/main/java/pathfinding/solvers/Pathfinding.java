@@ -15,6 +15,7 @@ public abstract class Pathfinding {
 
   protected MinHeap open;
   protected double[][] travelCosts;
+  protected int[][] visited;
 
   protected BufferedImage map;
 
@@ -39,6 +40,7 @@ public abstract class Pathfinding {
     this.map = map;
     this.open = new MinHeap();
     this.travelCosts = new double[map.getWidth() + 1][map.getHeight() + 1];
+    this.visited = new int[map.getWidth() + 1][map.getHeight() + 1];
 
     this.endX = endX;
     this.endY = endY;

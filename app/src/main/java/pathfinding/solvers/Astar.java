@@ -31,9 +31,10 @@ public class Astar extends Pathfinding {
     }
 
     Node current = new Node(null, startX, startY);
+    open.add(new Node(null, startX, startY));
 
-    open.add(current);
     travelCosts[startX][startY] = 0;
+
     start = Instant.now();
     while (!open.isEmpty()) {
       current = open.poll();
@@ -92,11 +93,12 @@ public class Astar extends Pathfinding {
     int nextX = neighbour.getPosX();
     int nextY = neighbour.getPosY();
 
-    if (!isEligibleMove(nextX, nextY)) {
+    if (!isEligibleMove(nextX, nextY) || visited[nextX][nextY] == 1) {
       return;
     }
 
     visitedNodes++;
+    visited[nextX][nextY] = 1;
 
     double currentCost = travelCosts[current.getPosX()][current.getPosY()];
     double newCost = currentCost + distance(current.getPosX(), current.getPosY(), nextX, nextY);

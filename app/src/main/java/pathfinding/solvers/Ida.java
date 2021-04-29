@@ -10,7 +10,6 @@ import pathfinding.entities.Node;
 public class Ida extends Pathfinding {
 
   private Node endNode;
-  private int[][] visited;
 
   public Ida(int startX, int startY, int endX, int endY, BufferedImage map) {
     super(startX, startY, endX, endY, map);
@@ -27,7 +26,6 @@ public class Ida extends Pathfinding {
 
     double bound = distance(startX, startY, endX, endY);
     int depth = 1;
-    visited = new int[map.getWidth() + 1][map.getHeight() + 1];
     start = Instant.now();
 
     while (true) {
@@ -54,11 +52,11 @@ public class Ida extends Pathfinding {
    * and h(x) is the cost approximation (heuristic) from current position to the end.
    *
    * @param current Node to be expanded
-   * @param currCost Movement cost so far, g(x)
+   * @param g Movement cost so far, g(x)
    * @param depth Current depth
    * @return Minimum Heap with successors
    */
-  private MinHeap successors(Node current, double currCost, int depth) {
+  private MinHeap successors(Node current, double g, int depth) {
     MinHeap minHeap = new MinHeap();
     for (int x = -1; x <= 1; x++) {
       for (int y = -1; y <= 1; y++) {
@@ -80,7 +78,7 @@ public class Ida extends Pathfinding {
         }
 
         Node node = new Node(current, nextX, nextY);
-        node.setTotalCost(currCost + distance(node.getPosX(), node.getPosY(), endX, endY));
+        node.setTotalCost(g + distance(node.getPosX(), node.getPosY(), endX, endY));
         minHeap.add(node);
       }
     }
@@ -97,9 +95,9 @@ public class Ida extends Pathfinding {
    * @return 0 if path finding takes too much time, f(x) + 1 if current upperbound is breached or
    *     -f(x) if goal is found.
    */
-  private double search(Node node, double currCost, double bound, int depth) {
+  private double search(Node node, double g, double bound, int depth) {
     double h = distance(node.getPosX(), node.getPosY(), endX, endY);
-    double f = currCost + h;
+    double f = g + h;
     Instant runtime = Instant.now();
     if (Duration.between(start, runtime).toMillis() >= timeout) {
       return 0;
@@ -115,13 +113,13 @@ public class Ida extends Pathfinding {
     }
 
     double newBound = Double.POSITIVE_INFINITY;
-    MinHeap neighbours = successors(node, currCost, depth);
+    MinHeap neighbours = successors(node, g, depth);
     while (!neighbours.isEmpty()) {
       Node next = neighbours.poll();
       int nextX = next.getPosX();
       int nextY = next.getPosY();
 
-      double newCost = currCost + distance(node.getPosX(), node.getPosY(), nextX, nextY);
+      double newCost = g + distance(node.getPosX(), node.getPosY(), nextX, nextY);
 
       visited[nextX][nextY] = depth;
       visitedNodes++;

@@ -226,15 +226,15 @@ public class Gui implements Runnable {
               endY = newY;
               addEnd = false;
               endPos.setText("End point: (" + endX + "," + endY + ")");
-              drawCircle(endX, endY, Color.RED, buffImg);
             } else if (Gui.addStart) {
               drawCircle(startX, startY, new Color(229, 229, 229), buffImg);
               startX = newX;
               startY = newY;
               addStart = false;
               startPos.setText("Start point: (" + startX + "," + startY + ")");
-              drawCircle(startX, startY, Color.GREEN, buffImg);
             }
+            drawCircle(endX, endY, Color.RED, buffImg);
+            drawCircle(startX, startY, Color.GREEN, buffImg);
             imageIcon.setImage(buffImg);
             picPanel.repaint();
           }
