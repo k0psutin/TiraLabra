@@ -11,11 +11,17 @@ git clone https://github.com/k0psutin/TiraLabra
 cd tiralabra
 ```
 
+Jar:
+
+```[CMD]
+java -jar pathfinding-1.0.jar
+```
+
 ## Setup
 
-Run `gradlew clean build` in command line or terminal.
+Run `gradlew build` in command line or terminal.
 
-Note: Running this command will generate all reports. However, if you want to generate any given report individually, see sections *[Checkstyle](#checkstyle)* or *[Jacoco test coverage](#jacoco-test-coverage)*.
+Note: Running this command will generate all reports (not Javadoc). However, if you want to generate any given report individually, see sections *[Checkstyle](#checkstyle)* or *[Jacoco test coverage](#jacoco-test-coverage)*.
 
 All reports can be found from the following folder: `\app\build\reports\`
 
@@ -26,6 +32,20 @@ You can start the program with the following command:
 ```[CMD]
 gradlew run
 ```
+
+## Generate Javadoc
+
+Run `gradlew javadoc` in terminal.
+
+Javadoc will be generated to `\app\build\docs\javadoc`
+
+## Build .jar
+
+```[CMD]
+gradlew packJar
+```
+
+`.jar` will be located at: `\app\build\libs\`
 
 ## Checkstyle
 
@@ -39,10 +59,10 @@ Once finished, a report will be generated to the folder `\app\build\reports\chec
 
 ## Jacoco test coverage
 
-You can generate Jacoco test coverage report with:
+You can generate the Jacoco test coverage report with:
 
 ```[CMD]
-gradlew clean test
+gradlew jacocoTestReport
 ```
 
 Once finished, a report will be generated to the folder `\app\build\reports\jacoco`.
