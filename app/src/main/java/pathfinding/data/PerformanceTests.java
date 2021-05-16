@@ -2,8 +2,10 @@ package pathfinding.data;
 
 import static pathfinding.tools.ImgTools.loadImage;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.net.URL;
 import javax.swing.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,18 +19,24 @@ import pathfinding.solvers.Pathfinding;
 public class PerformanceTests {
 
   private String[] paths = {"A*", "JPS", "IDA*"};
-  private String results = "# Test results\n";
-  private int reps = 10;
+  private String results = "# results.md\n\n## Test results\n";
+  private int reps = 20;
   private int testsDone = 0;
 
   private boolean isCanceled = false;
 
-  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  /**
+   * Run performance tests for all pathfinding algorithms.
+   *
+   * <p>Tests will use coordinates from \resources\data.json
+   *
+   * @param pm ProgressMonitor
+   */
   public void runTests(ProgressMonitor pm) {
-
     JSONObject file = null;
     try {
-      InputStream is = PerformanceTests.class.getResourceAsStream("/data.json");
+      URL res = getClass().getResource("/data.json");
+      InputStream is = res.openStream();
       JSONTokener tokener = new JSONTokener(is);
       file = new JSONObject(tokener);
     } catch (Exception e) {
@@ -47,7 +55,7 @@ public class PerformanceTests {
       JSONArray endX = (JSONArray) obj.getJSONArray("endx");
       JSONArray endY = (JSONArray) obj.getJSONArray("endy");
 
-      results += "\n## " + filename + "\n\n</br>\n\n";
+      results += "\n### " + filename + "\n";
 
       for (int i = 0; i < startX.length(); i++) {
 
@@ -56,8 +64,8 @@ public class PerformanceTests {
         int ex = (int) (endX.getInt(i));
         int ey = (int) (endY.getInt(i));
 
-        results += "StartX: " + sx + " StartY: " + sy + " EndX: " + ex + " EndY: " + ey + "\n";
         results += "\n</br>\n\n";
+        results += "StartX: " + sx + " StartY: " + sy + " EndX: " + ex + " EndY: " + ey + "\n";
         results += "| Algorithm | Solvetime (ms) | Nodes visited | Path cost |\n";
         results += "|--|--|--|--|\n";
 
@@ -89,7 +97,9 @@ public class PerformanceTests {
       }
     }
     try {
-      FileWriter result = new FileWriter("../results.md");
+      String filePath = System.getProperty("user.dir");
+      filePath = (filePath.contains("app") ? ".." : filePath) + File.separatorChar + "results.md";
+      FileWriter result = new FileWriter(filePath);
       result.write(results);
       result.close();
     } catch (Exception e) {
@@ -114,7 +124,7 @@ public class PerformanceTests {
   private void addResult(String name, int avgTime, int avgNodes, double avgCost, int div) {
     results += "|" + name;
     results += "|" + ((avgCost == 0.0) ? "Timeout" : (avgTime / div));
-    results += "|" + (avgNodes / div);
-    results += "|" + (avgCost / div) + "|\n";
+    results += "|" + ((avgCost == 0.0) ? "-" : (avgNodes / div));
+    results += "|" + ((avgCost == 0.0) ? "-" : (avgCost / div)) + "|\n";
   }
 }

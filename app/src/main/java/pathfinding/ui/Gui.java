@@ -12,11 +12,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -42,6 +40,7 @@ public class Gui implements Runnable {
   private JLabel startPos = null;
   private JLabel endPos = null;
   private static JComboBox<String> comboBox;
+  private static JComboBox<String> maps;
 
   private static boolean addStart = false;
   private static boolean addEnd = false;
@@ -51,6 +50,7 @@ public class Gui implements Runnable {
   private static int endX = 700;
 
   private String[] paths = {"A*", "JPS", "IDA*"};
+  private String[] images = {"arena.png", "arena2.png", "brc000d.png", "orz103d.png"};
 
   private final int imgSize = 800;
   private final int panelImgSize = 800;
@@ -61,28 +61,20 @@ public class Gui implements Runnable {
 
     frame = new JFrame("Pathfinding");
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    buffImg = loadImage(file, imgSize);
-
     JPanel panel = new JPanel();
 
-    JButton open = new JButton("Open image");
-    panel.add(open);
+    maps = new JComboBox<>(images);
+    panel.add(maps);
+    buffImg = loadImage(file, imgSize);
 
-    open.addActionListener(
+    maps.addActionListener(
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            JFileChooser fileChooser = new JFileChooser(".\\src\\main\\resources\\");
-            int option = fileChooser.showOpenDialog(frame);
-            if (option == JFileChooser.APPROVE_OPTION) {
-              File selectedFile = fileChooser.getSelectedFile();
-              file = selectedFile.getName();
-              buffImg = resizeImage(panelImgSize, panelImgSize, loadImage(file, imgSize));
-              drawCircle(endX, endY, Color.RED, buffImg);
-              drawCircle(startX, startY, Color.GREEN, buffImg);
-              imageIcon.setImage(buffImg);
-              picPanel.repaint();
-            }
+            file = maps.getSelectedItem().toString();
+            buffImg = loadImage(file, imgSize);
+            imageIcon.setImage(resizeImage(panelImgSize, panelImgSize, buffImg));
+            picPanel.repaint();
           }
         });
 
@@ -174,12 +166,14 @@ public class Gui implements Runnable {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            int choice = JOptionPane.showConfirmDialog(frame, "Run performance tests.");
+            int choice =
+                JOptionPane.showConfirmDialog(
+                    frame, "Run performance tests? \n (Note: this takes about 2 minutes.)");
             if (choice == JOptionPane.YES_OPTION) {
               new Thread(
                       () -> {
                         ProgressMonitor pm =
-                            new ProgressMonitor(frame, "Performance tests", "", 0, 27);
+                            new ProgressMonitor(frame, "Running performance tests", "", 0, 27);
                         pm.setMillisToDecideToPopup(0);
                         PerformanceTests tests = new PerformanceTests();
                         tests.runTests(pm);

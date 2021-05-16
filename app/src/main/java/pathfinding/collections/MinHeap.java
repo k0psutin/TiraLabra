@@ -45,7 +45,7 @@ public class MinHeap {
   /**
    * Rearranges Heap, lower priority nodes are brought upward towards root.
    *
-   * @param pos {@value integer}
+   * @param pos integer
    */
   private void heapify(int pos) {
     if (!isLeaf(pos)) {
@@ -149,9 +149,5 @@ public class MinHeap {
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public int size() {
     return size;
-  }
-
-  public Node[] getHeap() {
-    return this.heap;
   }
 }

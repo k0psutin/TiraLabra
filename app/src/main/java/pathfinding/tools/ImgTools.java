@@ -31,7 +31,7 @@ public class ImgTools {
   public static BufferedImage loadImage(String filename, int imgSize) {
     BufferedImage buffImg = null;
     try {
-      buffImg = ImageIO.read(ImgTools.class.getClassLoader().getResource(filename));
+      buffImg = ImageIO.read(ImgTools.class.getClassLoader().getResourceAsStream(filename));
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
