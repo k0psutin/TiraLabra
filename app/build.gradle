@@ -6,6 +6,17 @@ plugins {
 
 version = '1.0'
 
+task packJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Tiralabra: Pathfinding',  
+        	'Implementation-Version': archiveVersion,
+        	'Main-Class': 'pathfinding.main.Main'
+    }
+    archiveBaseName = rootProject.name
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
     jcenter()
 }
@@ -33,22 +44,11 @@ checkstyle {
 dependencies {
     testImplementation 'junit:junit:4.13'
     implementation 'com.google.guava:guava:29.0-jre'
-    implementation group: 'org.json', name: 'json', version: '20210307'
+    compile group: 'org.json', name: 'json', version: '20210307'
 }
 
 application {
     mainClass = 'pathfinding.main.Main'
-}
-
-task packJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Tiralabra: Pathfinding',  
-        	'Implementation-Version': archiveVersion,
-        	'Main-Class': 'pathfinding.main.Main'
-    }
-    archiveBaseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
 }
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
